@@ -1,3 +1,4 @@
+
 package com.siya.controller;
 
 import com.siya.entity.Booking;
@@ -9,6 +10,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/bookings")
+@CrossOrigin(
+    origins = "https://siyajadhav31.github.io",
+    allowCredentials = "true"
+)
 public class BookingController {
 
     private final BookingRepository bookingRepository;
@@ -29,7 +34,8 @@ public class BookingController {
     // ==========================================
 
     @PostMapping
-    public Booking createBooking(@RequestBody Booking booking) {
+    public Booking createBooking(
+            @RequestBody Booking booking) {
 
         // If booking type is not provided,
         // consider it as normal service booking.
@@ -60,7 +66,8 @@ public class BookingController {
     // ==========================================
 
     @GetMapping("/{id}")
-    public Booking getBookingById(@PathVariable Long id) {
+    public Booking getBookingById(
+            @PathVariable Long id) {
 
         return bookingRepository
                 .findById(id)
@@ -127,7 +134,9 @@ public class BookingController {
         // Update booking type only if provided
 
         if (updatedBooking.getBookingType() != null &&
-            !updatedBooking.getBookingType().trim().isEmpty()) {
+            !updatedBooking.getBookingType()
+                    .trim()
+                    .isEmpty()) {
 
             existingBooking.setBookingType(
                     updatedBooking.getBookingType()
@@ -144,7 +153,8 @@ public class BookingController {
     // ==========================================
 
     @DeleteMapping("/{id}")
-    public String deleteBooking(@PathVariable Long id) {
+    public String deleteBooking(
+            @PathVariable Long id) {
 
         if (!bookingRepository.existsById(id)) {
 

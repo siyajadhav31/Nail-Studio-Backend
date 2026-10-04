@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/admin")
 @CrossOrigin(
-    origins = "http://localhost:5500",
+    origins = "https://siyajadhav31.github.io",
     allowCredentials = "true"
 )
 public class AdminController {
@@ -32,20 +32,29 @@ public class AdminController {
             return "Admin not found";
         }
 
-        if (!existingAdmin.getPassword().equals(admin.getPassword())) {
+        if (!existingAdmin.getPassword()
+                .equals(admin.getPassword())) {
+
             return "Invalid admin password";
         }
 
-        // Store admin information in session
-        session.setAttribute("adminEmail", existingAdmin.getEmail());
-        session.setAttribute("adminLoggedIn", true);
+        session.setAttribute(
+                "adminEmail",
+                existingAdmin.getEmail()
+        );
+
+        session.setAttribute(
+                "adminLoggedIn",
+                true
+        );
 
         return "Admin login successful";
     }
 
 
     @GetMapping("/check")
-    public String checkAdminSession(HttpSession session) {
+    public String checkAdminSession(
+            HttpSession session) {
 
         Object adminLoggedIn =
                 session.getAttribute("adminLoggedIn");
@@ -61,7 +70,8 @@ public class AdminController {
 
 
     @PostMapping("/logout")
-    public String logoutAdmin(HttpSession session) {
+    public String logoutAdmin(
+            HttpSession session) {
 
         session.invalidate();
 
