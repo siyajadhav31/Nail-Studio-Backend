@@ -10,7 +10,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/bookings")
 @CrossOrigin(
-    origins = "https://siyajadhav31.github.io",
+    origins = {
+        "https://siyajadhav31.github.io",
+        "http://localhost:5500",
+        "http://127.0.0.1:5500"
+    },
     allowCredentials = "true"
 )
 public class BookingController {
@@ -99,7 +103,7 @@ public class BookingController {
 
 
         // ==========================================
-        // DATE FALLBACK
+        // DATE CHECK
         // ==========================================
 
         if (
@@ -112,12 +116,11 @@ public class BookingController {
             System.out.println(
                     "⚠️ Booking date missing"
             );
-
         }
 
 
         // ==========================================
-        // TIME FALLBACK
+        // TIME CHECK
         // ==========================================
 
         if (
@@ -130,7 +133,6 @@ public class BookingController {
             System.out.println(
                     "⚠️ Booking time missing"
             );
-
         }
 
 
@@ -146,9 +148,7 @@ public class BookingController {
         ) {
 
             /*
-             * If old frontend sends a virtual
-             * preview note but does not send
-             * bookingType, automatically detect it.
+             * Detect old virtual preview booking.
              */
 
             if (
@@ -167,7 +167,6 @@ public class BookingController {
                 booking.setBookingType(
                         "SERVICE"
                 );
-
             }
 
         } else {
@@ -177,12 +176,11 @@ public class BookingController {
                             .trim()
                             .toUpperCase()
             );
-
         }
 
 
         // ==========================================
-        // SAVE
+        // SAVE BOOKING
         // ==========================================
 
         Booking savedBooking =
@@ -280,16 +278,13 @@ public class BookingController {
                 updatedBooking.getName()
         );
 
-
         existingBooking.setEmail(
                 updatedBooking.getEmail()
         );
 
-
         existingBooking.setPhone(
                 updatedBooking.getPhone()
         );
-
 
         existingBooking.setService(
                 updatedBooking.getService()
@@ -304,16 +299,13 @@ public class BookingController {
                 updatedBooking.getDesign()
         );
 
-
         existingBooking.setShape(
                 updatedBooking.getShape()
         );
 
-
         existingBooking.setShade(
                 updatedBooking.getShade()
         );
-
 
         existingBooking.setNotes(
                 updatedBooking.getNotes()
@@ -331,7 +323,6 @@ public class BookingController {
             existingBooking.setBookingDate(
                     updatedBooking.getBookingDate()
             );
-
         }
 
 
@@ -346,7 +337,6 @@ public class BookingController {
             existingBooking.setBookingTime(
                     updatedBooking.getBookingTime()
             );
-
         }
 
 
@@ -368,7 +358,6 @@ public class BookingController {
                             .trim()
                             .toUpperCase()
             );
-
         }
 
 
@@ -376,9 +365,31 @@ public class BookingController {
         // SAVE UPDATED BOOKING
         // ==========================================
 
-        return bookingRepository.save(
-                existingBooking
+        Booking savedBooking =
+                bookingRepository.save(
+                        existingBooking
+                );
+
+
+        System.out.println(
+                "================================="
         );
+
+        System.out.println(
+                "💅 BOOKING UPDATED"
+        );
+
+        System.out.println(
+                "ID: " +
+                savedBooking.getId()
+        );
+
+        System.out.println(
+                "================================="
+        );
+
+
+        return savedBooking;
     }
 
 
@@ -390,17 +401,60 @@ public class BookingController {
     public String deleteBooking(
             @PathVariable Long id) {
 
+        System.out.println(
+                "================================="
+        );
+
+        System.out.println(
+                "🗑 DELETE BOOKING REQUEST"
+        );
+
+        System.out.println(
+                "Booking ID: " + id
+        );
+
+
+        // ==========================================
+        // CHECK BOOKING
+        // ==========================================
+
         if (
             !bookingRepository.existsById(id)
         ) {
+
+            System.out.println(
+                    "❌ BOOKING NOT FOUND"
+            );
+
+            System.out.println(
+                    "================================="
+            );
 
             return "Booking not found";
         }
 
 
+        // ==========================================
+        // DELETE
+        // ==========================================
+
         bookingRepository.deleteById(id);
+
+
+        System.out.println(
+                "✅ BOOKING DELETED"
+        );
+
+        System.out.println(
+                "Deleted ID: " + id
+        );
+
+        System.out.println(
+                "================================="
+        );
 
 
         return "Booking deleted successfully";
     }
+
 }
