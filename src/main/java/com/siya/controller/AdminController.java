@@ -8,7 +8,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/admin")
 @CrossOrigin(
-    origins = "https://siyajadhav31.github.io",
+    origins = {
+        "http://localhost:5500",
+        "http://127.0.0.1:5500",
+        "https://siyajadhav31.github.io"
+    },
     allowCredentials = "true"
 )
 public class AdminController {
@@ -24,16 +28,30 @@ public class AdminController {
             @RequestBody Admin admin,
             HttpSession session) {
 
+        System.out.println("=================================");
+        System.out.println("ADMIN LOGIN REQUEST");
+        System.out.println("Email received: [" + admin.getEmail() + "]");
+        System.out.println("Password received: [" + admin.getPassword() + "]");
+        System.out.println("=================================");
+
         Admin existingAdmin = adminRepository
                 .findByEmail(admin.getEmail())
                 .orElse(null);
 
         if (existingAdmin == null) {
+
+            System.out.println("ADMIN NOT FOUND");
+
             return "Admin not found";
         }
 
+        System.out.println("ADMIN FOUND");
+        System.out.println("Database email: [" + existingAdmin.getEmail() + "]");
+
         if (!existingAdmin.getPassword()
                 .equals(admin.getPassword())) {
+
+            System.out.println("INVALID PASSWORD");
 
             return "Invalid admin password";
         }
@@ -48,6 +66,8 @@ public class AdminController {
                 true
         );
 
+        System.out.println("ADMIN LOGIN SUCCESS");
+
         return "Admin login successful";
     }
 
@@ -59,8 +79,8 @@ public class AdminController {
         Object adminLoggedIn =
                 session.getAttribute("adminLoggedIn");
 
-        if (adminLoggedIn != null &&
-            (Boolean) adminLoggedIn) {
+        if (adminLoggedIn != null
+                && (Boolean) adminLoggedIn) {
 
             return "Admin authenticated";
         }
