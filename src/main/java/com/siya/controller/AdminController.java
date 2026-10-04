@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpSession;
 
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/admin")
 @CrossOrigin(
@@ -26,6 +28,10 @@ public class AdminController {
     }
 
 
+    // ==========================================
+    // ADMIN LOGIN
+    // ==========================================
+
     @PostMapping("/login")
     public String loginAdmin(
             @RequestBody Admin admin,
@@ -37,10 +43,28 @@ public class AdminController {
         System.out.println("Password received: [" + admin.getPassword() + "]");
         System.out.println("=================================");
 
-        Admin existingAdmin = adminRepository
-                .findByEmail(admin.getEmail())
-                .orElse(null);
 
+        // Get all admins from database
+        List<Admin> admins = adminRepository.findAll();
+
+        Admin existingAdmin = null;
+
+
+        // Find admin by email
+        for (Admin a : admins) {
+
+            if (a.getEmail() != null
+                    && admin.getEmail() != null
+                    && a.getEmail().trim()
+                        .equalsIgnoreCase(admin.getEmail().trim())) {
+
+                existingAdmin = a;
+                break;
+            }
+        }
+
+
+        // Admin not found
         if (existingAdmin == null) {
 
             System.out.println("ADMIN NOT FOUND");
@@ -48,19 +72,25 @@ public class AdminController {
             return "Admin not found";
         }
 
+
         System.out.println("ADMIN FOUND");
         System.out.println(
             "Database email: [" + existingAdmin.getEmail() + "]"
         );
 
-        if (!existingAdmin.getPassword()
-                .equals(admin.getPassword())) {
+
+        // Check password
+        if (existingAdmin.getPassword() == null
+                || !existingAdmin.getPassword()
+                    .equals(admin.getPassword())) {
 
             System.out.println("INVALID PASSWORD");
 
             return "Invalid admin password";
         }
 
+
+        // Create session
         session.setAttribute(
                 "adminEmail",
                 existingAdmin.getEmail()
@@ -71,18 +101,27 @@ public class AdminController {
                 true
         );
 
+
         System.out.println("ADMIN LOGIN SUCCESS");
 
         return "Admin login successful";
     }
 
 
+    // ==========================================
+    // GET ALL ADMINS
+    // ==========================================
+
     @GetMapping("/all")
-    public Object getAllAdmins() {
+    public List<Admin> getAllAdmins() {
 
         return adminRepository.findAll();
     }
 
+
+    // ==========================================
+    // CHECK ADMIN SESSION
+    // ==========================================
 
     @GetMapping("/check")
     public String checkAdminSession(
@@ -100,6 +139,10 @@ public class AdminController {
         return "Admin not authenticated";
     }
 
+
+    // ==========================================
+    // ADMIN LOGOUT
+    // ==========================================
 
     @PostMapping("/logout")
     public String logoutAdmin(
