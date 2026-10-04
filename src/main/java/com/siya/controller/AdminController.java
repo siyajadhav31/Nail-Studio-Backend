@@ -2,7 +2,9 @@ package com.siya.controller;
 
 import com.siya.entity.Admin;
 import com.siya.repository.AdminRepository;
+
 import jakarta.servlet.http.HttpSession;
+
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,6 +24,7 @@ public class AdminController {
     public AdminController(AdminRepository adminRepository) {
         this.adminRepository = adminRepository;
     }
+
 
     @PostMapping("/login")
     public String loginAdmin(
@@ -46,7 +49,9 @@ public class AdminController {
         }
 
         System.out.println("ADMIN FOUND");
-        System.out.println("Database email: [" + existingAdmin.getEmail() + "]");
+        System.out.println(
+            "Database email: [" + existingAdmin.getEmail() + "]"
+        );
 
         if (!existingAdmin.getPassword()
                 .equals(admin.getPassword())) {
@@ -69,6 +74,13 @@ public class AdminController {
         System.out.println("ADMIN LOGIN SUCCESS");
 
         return "Admin login successful";
+    }
+
+
+    @GetMapping("/all")
+    public Object getAllAdmins() {
+
+        return adminRepository.findAll();
     }
 
 
@@ -97,4 +109,5 @@ public class AdminController {
 
         return "Admin logout successful";
     }
+
 }
