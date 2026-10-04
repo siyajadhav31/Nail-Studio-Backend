@@ -11,10 +11,14 @@ import org.springframework.context.annotation.Configuration;
 public class AdminDataInitializer {
 
     @Bean
-    CommandLineRunner createDefaultAdmin(
+    public CommandLineRunner createDefaultAdmin(
             AdminRepository adminRepository) {
 
         return args -> {
+
+            System.out.println("=================================");
+            System.out.println("ADMIN INITIALIZER RUNNING");
+            System.out.println("=================================");
 
             if (adminRepository.findByEmail("admin@gmail.com").isEmpty()) {
 
@@ -25,32 +29,17 @@ public class AdminDataInitializer {
 
                 adminRepository.save(admin);
 
-                System.out.println(
-                    "================================="
-                );
-
-                System.out.println(
-                    "DEFAULT ADMIN CREATED"
-                );
-
-                System.out.println(
-                    "Email: admin@gmail.com"
-                );
-
-                System.out.println(
-                    "Password: admin123"
-                );
-
-                System.out.println(
-                    "================================="
-                );
+                System.out.println("=================================");
+                System.out.println("DEFAULT ADMIN CREATED");
+                System.out.println("Email: admin@gmail.com");
+                System.out.println("Password: admin123");
+                System.out.println("=================================");
 
             } else {
 
-                System.out.println(
-                    "DEFAULT ADMIN ALREADY EXISTS"
-                );
-
+                System.out.println("=================================");
+                System.out.println("DEFAULT ADMIN ALREADY EXISTS");
+                System.out.println("=================================");
             }
         };
     }
