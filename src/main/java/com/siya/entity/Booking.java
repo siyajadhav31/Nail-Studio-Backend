@@ -1,5 +1,6 @@
 package com.siya.entity;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,11 +23,19 @@ public class Booking {
 
     private String design;
 
+    private String shape;
+
+    private String shade;
+
+    @JsonAlias({"date"})
     private String bookingDate;
 
+    @JsonAlias({"time"})
     private String bookingTime;
 
     private String bookingType;
+
+    private String notes;
 
 
     // ==========================================
@@ -38,13 +47,17 @@ public class Booking {
 
 
     // ==========================================
-    // GETTER AND SETTER
+    // GET ID
     // ==========================================
 
     public Long getId() {
         return id;
     }
 
+
+    // ==========================================
+    // NAME
+    // ==========================================
 
     public String getName() {
         return name;
@@ -55,6 +68,10 @@ public class Booking {
     }
 
 
+    // ==========================================
+    // EMAIL
+    // ==========================================
+
     public String getEmail() {
         return email;
     }
@@ -63,6 +80,10 @@ public class Booking {
         this.email = email;
     }
 
+
+    // ==========================================
+    // PHONE
+    // ==========================================
 
     public String getPhone() {
         return phone;
@@ -73,6 +94,10 @@ public class Booking {
     }
 
 
+    // ==========================================
+    // SERVICE
+    // ==========================================
+
     public String getService() {
         return service;
     }
@@ -81,6 +106,10 @@ public class Booking {
         this.service = service;
     }
 
+
+    // ==========================================
+    // DESIGN
+    // ==========================================
 
     public String getDesign() {
         return design;
@@ -91,6 +120,36 @@ public class Booking {
     }
 
 
+    // ==========================================
+    // SHAPE
+    // ==========================================
+
+    public String getShape() {
+        return shape;
+    }
+
+    public void setShape(String shape) {
+        this.shape = shape;
+    }
+
+
+    // ==========================================
+    // SHADE
+    // ==========================================
+
+    public String getShade() {
+        return shade;
+    }
+
+    public void setShade(String shade) {
+        this.shade = shade;
+    }
+
+
+    // ==========================================
+    // BOOKING DATE
+    // ==========================================
+
     public String getBookingDate() {
         return bookingDate;
     }
@@ -99,6 +158,10 @@ public class Booking {
         this.bookingDate = bookingDate;
     }
 
+
+    // ==========================================
+    // BOOKING TIME
+    // ==========================================
 
     public String getBookingTime() {
         return bookingTime;
@@ -109,11 +172,28 @@ public class Booking {
     }
 
 
+    // ==========================================
+    // BOOKING TYPE
+    // ==========================================
+
     public String getBookingType() {
         return bookingType;
     }
 
     public void setBookingType(String bookingType) {
         this.bookingType = bookingType;
+    }
+
+
+    // ==========================================
+    // NOTES
+    // ==========================================
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 }

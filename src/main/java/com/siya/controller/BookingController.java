@@ -1,4 +1,3 @@
-
 package com.siya.controller;
 
 import com.siya.entity.Booking;
@@ -23,9 +22,11 @@ public class BookingController {
     // CONSTRUCTOR
     // ==========================================
 
-    public BookingController(BookingRepository bookingRepository) {
+    public BookingController(
+            BookingRepository bookingRepository) {
 
-        this.bookingRepository = bookingRepository;
+        this.bookingRepository =
+                bookingRepository;
     }
 
 
@@ -37,16 +38,191 @@ public class BookingController {
     public Booking createBooking(
             @RequestBody Booking booking) {
 
-        // If booking type is not provided,
-        // consider it as normal service booking.
+        System.out.println(
+                "================================="
+        );
 
-        if (booking.getBookingType() == null ||
-            booking.getBookingType().trim().isEmpty()) {
+        System.out.println(
+                "💅 NEW BOOKING RECEIVED"
+        );
 
-            booking.setBookingType("SERVICE");
+        System.out.println(
+                "Name: " + booking.getName()
+        );
+
+        System.out.println(
+                "Email: " + booking.getEmail()
+        );
+
+        System.out.println(
+                "Phone: " + booking.getPhone()
+        );
+
+        System.out.println(
+                "Service: " + booking.getService()
+        );
+
+        System.out.println(
+                "Booking Date: " +
+                booking.getBookingDate()
+        );
+
+        System.out.println(
+                "Booking Time: " +
+                booking.getBookingTime()
+        );
+
+        System.out.println(
+                "Booking Type: " +
+                booking.getBookingType()
+        );
+
+        System.out.println(
+                "Design: " +
+                booking.getDesign()
+        );
+
+        System.out.println(
+                "Shape: " +
+                booking.getShape()
+        );
+
+        System.out.println(
+                "Shade: " +
+                booking.getShade()
+        );
+
+        System.out.println(
+                "Notes: " +
+                booking.getNotes()
+        );
+
+
+        // ==========================================
+        // DATE FALLBACK
+        // ==========================================
+
+        if (
+            booking.getBookingDate() == null ||
+            booking.getBookingDate()
+                    .trim()
+                    .isEmpty()
+        ) {
+
+            System.out.println(
+                    "⚠️ Booking date missing"
+            );
+
         }
 
-        return bookingRepository.save(booking);
+
+        // ==========================================
+        // TIME FALLBACK
+        // ==========================================
+
+        if (
+            booking.getBookingTime() == null ||
+            booking.getBookingTime()
+                    .trim()
+                    .isEmpty()
+        ) {
+
+            System.out.println(
+                    "⚠️ Booking time missing"
+            );
+
+        }
+
+
+        // ==========================================
+        // BOOKING TYPE
+        // ==========================================
+
+        if (
+            booking.getBookingType() == null ||
+            booking.getBookingType()
+                    .trim()
+                    .isEmpty()
+        ) {
+
+            /*
+             * If old frontend sends a virtual
+             * preview note but does not send
+             * bookingType, automatically detect it.
+             */
+
+            if (
+                booking.getNotes() != null &&
+                booking.getNotes()
+                        .toLowerCase()
+                        .contains("virtual preview")
+            ) {
+
+                booking.setBookingType(
+                        "VIRTUAL"
+                );
+
+            } else {
+
+                booking.setBookingType(
+                        "SERVICE"
+                );
+
+            }
+
+        } else {
+
+            booking.setBookingType(
+                    booking.getBookingType()
+                            .trim()
+                            .toUpperCase()
+            );
+
+        }
+
+
+        // ==========================================
+        // SAVE
+        // ==========================================
+
+        Booking savedBooking =
+                bookingRepository.save(booking);
+
+
+        System.out.println(
+                "================================="
+        );
+
+        System.out.println(
+                "✅ BOOKING SAVED"
+        );
+
+        System.out.println(
+                "ID: " +
+                savedBooking.getId()
+        );
+
+        System.out.println(
+                "Type: " +
+                savedBooking.getBookingType()
+        );
+
+        System.out.println(
+                "Date: " +
+                savedBooking.getBookingDate()
+        );
+
+        System.out.println(
+                "Time: " +
+                savedBooking.getBookingTime()
+        );
+
+        System.out.println(
+                "================================="
+        );
+
+
+        return savedBooking;
     }
 
 
@@ -96,6 +272,10 @@ public class BookingController {
         }
 
 
+        // ==========================================
+        // BASIC DETAILS
+        // ==========================================
+
         existingBooking.setName(
                 updatedBooking.getName()
         );
@@ -116,35 +296,89 @@ public class BookingController {
         );
 
 
+        // ==========================================
+        // VIRTUAL DETAILS
+        // ==========================================
+
         existingBooking.setDesign(
                 updatedBooking.getDesign()
         );
 
 
-        existingBooking.setBookingDate(
-                updatedBooking.getBookingDate()
+        existingBooking.setShape(
+                updatedBooking.getShape()
         );
 
 
-        existingBooking.setBookingTime(
-                updatedBooking.getBookingTime()
+        existingBooking.setShade(
+                updatedBooking.getShade()
         );
 
 
-        // Update booking type only if provided
+        existingBooking.setNotes(
+                updatedBooking.getNotes()
+        );
 
-        if (updatedBooking.getBookingType() != null &&
-            !updatedBooking.getBookingType()
-                    .trim()
-                    .isEmpty()) {
 
-            existingBooking.setBookingType(
-                    updatedBooking.getBookingType()
+        // ==========================================
+        // DATE
+        // ==========================================
+
+        if (
+            updatedBooking.getBookingDate() != null
+        ) {
+
+            existingBooking.setBookingDate(
+                    updatedBooking.getBookingDate()
             );
+
         }
 
 
-        return bookingRepository.save(existingBooking);
+        // ==========================================
+        // TIME
+        // ==========================================
+
+        if (
+            updatedBooking.getBookingTime() != null
+        ) {
+
+            existingBooking.setBookingTime(
+                    updatedBooking.getBookingTime()
+            );
+
+        }
+
+
+        // ==========================================
+        // BOOKING TYPE
+        // ==========================================
+
+        if (
+            updatedBooking.getBookingType() != null &&
+            !updatedBooking
+                    .getBookingType()
+                    .trim()
+                    .isEmpty()
+        ) {
+
+            existingBooking.setBookingType(
+                    updatedBooking
+                            .getBookingType()
+                            .trim()
+                            .toUpperCase()
+            );
+
+        }
+
+
+        // ==========================================
+        // SAVE UPDATED BOOKING
+        // ==========================================
+
+        return bookingRepository.save(
+                existingBooking
+        );
     }
 
 
@@ -156,7 +390,9 @@ public class BookingController {
     public String deleteBooking(
             @PathVariable Long id) {
 
-        if (!bookingRepository.existsById(id)) {
+        if (
+            !bookingRepository.existsById(id)
+        ) {
 
             return "Booking not found";
         }
