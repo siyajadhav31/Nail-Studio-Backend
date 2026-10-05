@@ -31,11 +31,153 @@ public class BookingController {
 
 
     // ==========================================
+    // SERVICE PRICE METHOD
+    // ==========================================
+
+    private double getServicePrice(String service) {
+
+        if (service == null) {
+            return 0.0;
+        }
+
+        switch (service.trim()) {
+
+            // ==================================
+            // NORMAL RANGE
+            // ==================================
+
+            case "Basic Gel Polish":
+                return 500.0;
+
+            case "Acrylic Overlay (Natural Nails)":
+                return 800.0;
+
+            case "Basic Acrylic Extensions":
+                return 1200.0;
+
+            case "Machine Printed Press-On Nails":
+                return 300.0;
+
+            case "Cut Polish & Basic Nail Art":
+                return 400.0;
+
+            case "Basic French Manicure":
+                return 700.0;
+
+
+            // ==================================
+            // PREMIUM RANGE
+            // ==================================
+
+            case "Soft Gel Extensions":
+                return 2000.0;
+
+            case "BIAB (Builder Gel) Extensions":
+                return 2200.0;
+
+            case "Ombre Gel Extensions":
+                return 2500.0;
+
+            case "Chrome Finish Gel Extensions":
+                return 2200.0;
+
+            case "Cat-Eye Gel Nails":
+                return 2400.0;
+
+            case "Custom Handmade Press-Ons":
+                return 1200.0;
+
+            case "Rubber Base Gel Overlay":
+                return 1800.0;
+
+            case "Matte Finish Gel Extensions":
+                return 2000.0;
+
+            case "Glitter Inbuilt Acrylic Extensions":
+                return 2500.0;
+
+            case "Minimalist Hand-Painted Art Extensions":
+                return 2500.0;
+
+
+            // ==================================
+            // LUXURY RANGE
+            // ==================================
+
+            case "Polygel Sculpted Extensions":
+                return 3500.0;
+
+            case "Hard Gel Extensions":
+                return 3800.0;
+
+            case "3D Encapsulated Art Extensions":
+                return 4500.0;
+
+            case "Swarovski & Crystal Studded Set":
+                return 5000.0;
+
+            case "Bridal Luxury Customized Set":
+                return 6000.0;
+
+            case "Glass/Clear Jelly Extensions with Foil":
+                return 4000.0;
+
+            case "Russian Dry Manicure + Polygel Set":
+                return 4500.0;
+
+            case "Metallic 3D Sculpted Charms Set":
+                return 5000.0;
+
+            case "Hand-Sculpted Floral 3D Art Extensions":
+                return 4800.0;
+
+
+            // ==================================
+            // SERVICES PAGE
+            // ==================================
+
+            case "Acrylic Extensions + Gel Polish":
+                return 1800.0;
+
+            case "Hands Gel Polish":
+                return 699.0;
+
+            case "Bridal Nails":
+                return 2499.0;
+
+            case "Temporary Nails + Gel Polish":
+                return 1199.0;
+
+            case "Burgundy Nails":
+                return 1299.0;
+
+            case "French Nails":
+                return 999.0;
+
+            case "Rouge Nails":
+                return 1399.0;
+
+            case "Polka Dot Nails":
+                return 1099.0;
+
+
+            // ==================================
+            // UNKNOWN SERVICE
+            // ==================================
+
+            default:
+                return 0.0;
+        }
+    }
+
+
+    // ==========================================
     // CREATE BOOKING
     // ==========================================
 
     @PostMapping
-    public Booking createBooking(@RequestBody Booking booking) {
+    public Booking createBooking(
+            @RequestBody Booking booking) {
 
         System.out.println("=================================");
         System.out.println("💅 NEW BOOKING RECEIVED");
@@ -46,62 +188,44 @@ public class BookingController {
         System.out.println("Service: " + booking.getService());
 
         System.out.println(
-            "Booking Date: " + booking.getBookingDate()
+            "Booking Date: " +
+            booking.getBookingDate()
         );
 
         System.out.println(
-            "Booking Time: " + booking.getBookingTime()
+            "Booking Time: " +
+            booking.getBookingTime()
         );
 
         System.out.println(
-            "Booking Type: " + booking.getBookingType()
+            "Booking Type: " +
+            booking.getBookingType()
         );
 
         System.out.println(
-            "Design: " + booking.getDesign()
+            "Design: " +
+            booking.getDesign()
         );
 
         System.out.println(
-            "Shape: " + booking.getShape()
+            "Shape: " +
+            booking.getShape()
         );
 
         System.out.println(
-            "Shade: " + booking.getShade()
+            "Shade: " +
+            booking.getShade()
         );
 
         System.out.println(
-            "Notes: " + booking.getNotes()
+            "Notes: " +
+            booking.getNotes()
         );
 
         System.out.println(
-            "Payment Method: " + booking.getPaymentMethod()
+            "Payment Method: " +
+            booking.getPaymentMethod()
         );
-
-
-        // ==========================================
-        // DATE CHECK
-        // ==========================================
-
-        if (
-            booking.getBookingDate() == null ||
-            booking.getBookingDate().trim().isEmpty()
-        ) {
-
-            System.out.println("⚠️ Booking date missing");
-        }
-
-
-        // ==========================================
-        // TIME CHECK
-        // ==========================================
-
-        if (
-            booking.getBookingTime() == null ||
-            booking.getBookingTime().trim().isEmpty()
-        ) {
-
-            System.out.println("⚠️ Booking time missing");
-        }
 
 
         // ==========================================
@@ -110,12 +234,10 @@ public class BookingController {
 
         if (
             booking.getBookingType() == null ||
-            booking.getBookingType().trim().isEmpty()
+            booking.getBookingType()
+                .trim()
+                .isEmpty()
         ) {
-
-            /*
-             * Detect old virtual preview booking.
-             */
 
             if (
                 booking.getNotes() != null &&
@@ -147,7 +269,9 @@ public class BookingController {
 
         if (
             booking.getPaymentMethod() == null ||
-            booking.getPaymentMethod().trim().isEmpty()
+            booking.getPaymentMethod()
+                .trim()
+                .isEmpty()
         ) {
 
             booking.setPaymentMethod("CASH");
@@ -167,8 +291,10 @@ public class BookingController {
         // ==========================================
 
         /*
-         * We are not using Razorpay now.
-         * Therefore booking is directly confirmed.
+         * No Razorpay is being used.
+         *
+         * Therefore the appointment is directly
+         * marked as CONFIRMED.
          */
 
         booking.setPaymentStatus("CONFIRMED");
@@ -178,57 +304,12 @@ public class BookingController {
         // SERVICE PRICE
         // ==========================================
 
-        /*
-         * Backend decides the actual service price.
-         * This is safer than trusting the price
-         * coming from the frontend.
-         */
+        double servicePrice =
+            getServicePrice(
+                booking.getService()
+            );
 
-        String service = booking.getService();
-
-        if (service != null) {
-
-            service = service.trim();
-
-            switch (service) {
-
-                case "Acrylic Extensions + Gel Polish":
-                    booking.setPaymentAmount(1800.0);
-                    break;
-
-                case "Hands Gel Polish":
-                    booking.setPaymentAmount(699.0);
-                    break;
-
-                case "Bridal Nails":
-                    booking.setPaymentAmount(2499.0);
-                    break;
-
-                case "Temporary Nails + Gel Polish":
-                    booking.setPaymentAmount(1199.0);
-                    break;
-
-                case "Burgundy Nails":
-                    booking.setPaymentAmount(1299.0);
-                    break;
-
-                case "French Nails":
-                    booking.setPaymentAmount(999.0);
-                    break;
-
-                case "Rouge Nails":
-                    booking.setPaymentAmount(1399.0);
-                    break;
-
-                case "Polka Dot Nails":
-                    booking.setPaymentAmount(1099.0);
-                    break;
-
-                default:
-                    booking.setPaymentAmount(0.0);
-                    break;
-            }
-        }
+        booking.setPaymentAmount(servicePrice);
 
 
         // ==========================================
@@ -247,27 +328,18 @@ public class BookingController {
         System.out.println("✅ BOOKING SAVED");
 
         System.out.println(
-            "ID: " + savedBooking.getId()
+            "ID: " +
+            savedBooking.getId()
         );
 
         System.out.println(
-            "Type: " + savedBooking.getBookingType()
+            "Service: " +
+            savedBooking.getService()
         );
 
         System.out.println(
-            "Service: " + savedBooking.getService()
-        );
-
-        System.out.println(
-            "Amount: ₹" + savedBooking.getPaymentAmount()
-        );
-
-        System.out.println(
-            "Date: " + savedBooking.getBookingDate()
-        );
-
-        System.out.println(
-            "Time: " + savedBooking.getBookingTime()
+            "Amount: ₹" +
+            savedBooking.getPaymentAmount()
         );
 
         System.out.println(
@@ -307,8 +379,8 @@ public class BookingController {
             @PathVariable Long id) {
 
         return bookingRepository
-                .findById(id)
-                .orElse(null);
+            .findById(id)
+            .orElse(null);
     }
 
 
@@ -378,52 +450,14 @@ public class BookingController {
         // PAYMENT AMOUNT
         // ==========================================
 
-        String service =
-            updatedBooking.getService();
+        double servicePrice =
+            getServicePrice(
+                updatedBooking.getService()
+            );
 
-        if (service != null) {
-
-            service = service.trim();
-
-            switch (service) {
-
-                case "Acrylic Extensions + Gel Polish":
-                    existingBooking.setPaymentAmount(1800.0);
-                    break;
-
-                case "Hands Gel Polish":
-                    existingBooking.setPaymentAmount(699.0);
-                    break;
-
-                case "Bridal Nails":
-                    existingBooking.setPaymentAmount(2499.0);
-                    break;
-
-                case "Temporary Nails + Gel Polish":
-                    existingBooking.setPaymentAmount(1199.0);
-                    break;
-
-                case "Burgundy Nails":
-                    existingBooking.setPaymentAmount(1299.0);
-                    break;
-
-                case "French Nails":
-                    existingBooking.setPaymentAmount(999.0);
-                    break;
-
-                case "Rouge Nails":
-                    existingBooking.setPaymentAmount(1399.0);
-                    break;
-
-                case "Polka Dot Nails":
-                    existingBooking.setPaymentAmount(1099.0);
-                    break;
-
-                default:
-                    existingBooking.setPaymentAmount(0.0);
-                    break;
-            }
-        }
+        existingBooking.setPaymentAmount(
+            servicePrice
+        );
 
 
         // ==========================================
@@ -497,7 +531,7 @@ public class BookingController {
 
 
         // ==========================================
-        // SAVE UPDATED BOOKING
+        // SAVE
         // ==========================================
 
         Booking savedBooking =
@@ -510,11 +544,13 @@ public class BookingController {
         System.out.println("💅 BOOKING UPDATED");
 
         System.out.println(
-            "ID: " + savedBooking.getId()
+            "ID: " +
+            savedBooking.getId()
         );
 
         System.out.println(
-            "Service: " + savedBooking.getService()
+            "Service: " +
+            savedBooking.getService()
         );
 
         System.out.println(
