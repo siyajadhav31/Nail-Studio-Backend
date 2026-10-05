@@ -36,6 +36,14 @@ public class Booking {
     private String bookingType;
 
     private String notes;
+    
+    private String paymentStatus;
+
+    private String paymentId;
+
+    private String razorpayOrderId;
+
+    private Double paymentAmount;
 
 
     // ==========================================
@@ -196,4 +204,55 @@ public class Booking {
     public void setNotes(String notes) {
         this.notes = notes;
     }
+    
+ // ==========================================
+ // PAYMENT STATUS
+ // ==========================================
+
+ public String getPaymentStatus() {
+     return paymentStatus;
+ }
+
+ public void setPaymentStatus(String paymentStatus) {
+     this.paymentStatus = paymentStatus;
+ }
+
+
+ // ==========================================
+ // PAYMENT ID
+ // ==========================================
+
+ public String getPaymentId() {
+     return paymentId;
+ }
+
+ public void setPaymentId(String paymentId) {
+     this.paymentId = paymentId;
+ }
+
+
+ // ==========================================
+ // RAZORPAY ORDER ID
+ // ==========================================
+
+ public String getRazorpayOrderId() {
+     return razorpayOrderId;
+ }
+
+ public void setRazorpayOrderId(String razorpayOrderId) {
+     this.razorpayOrderId = razorpayOrderId;
+ }
+
+
+ // ==========================================
+ // PAYMENT AMOUNT
+ // ==========================================
+
+ public Double getPaymentAmount() {
+     return paymentAmount;
+ }
+
+ public void setPaymentAmount(Double paymentAmount) {
+     this.paymentAmount = paymentAmount;
+ }
 }
