@@ -16,19 +16,60 @@ public class AdminDataInitializer {
 
         return args -> {
 
+<<<<<<< HEAD
             System.out.println("=================================");
             System.out.println("ADMIN INITIALIZER RUNNING");
             System.out.println("=================================");
 
             if (adminRepository.findByEmail("admin@gmail.com").isEmpty()) {
+=======
+            System.out.println(
+                "================================="
+            );
+
+            System.out.println(
+                "ADMIN INITIALIZER RUNNING"
+            );
+
+            System.out.println(
+                "================================="
+            );
+
+
+            // ------------------------------------------
+            // CHECK ADMIN
+            // ------------------------------------------
+
+            if (
+                adminRepository
+                    .findByEmail("admin@gmail.com")
+                    .isEmpty()
+            ) {
+>>>>>>> be2f73b (booking)
 
                 Admin admin = new Admin();
 
-                admin.setEmail("admin@gmail.com");
-                admin.setPassword("admin123");
+
+                // ------------------------------------------
+                // DEFAULT ADMIN
+                // ------------------------------------------
+
+                admin.setEmail(
+                    "admin@gmail.com"
+                );
+
+                admin.setPassword(
+                    "admin123"
+                );
+
+
+                // ------------------------------------------
+                // SAVE ADMIN
+                // ------------------------------------------
 
                 adminRepository.save(admin);
 
+<<<<<<< HEAD
                 System.out.println("=================================");
                 System.out.println("DEFAULT ADMIN CREATED");
                 System.out.println("Email: admin@gmail.com");
@@ -40,6 +81,42 @@ public class AdminDataInitializer {
                 System.out.println("=================================");
                 System.out.println("DEFAULT ADMIN ALREADY EXISTS");
                 System.out.println("=================================");
+=======
+
+                System.out.println(
+                    "================================="
+                );
+
+                System.out.println(
+                    "DEFAULT ADMIN CREATED"
+                );
+
+                System.out.println(
+                    "Email: admin@gmail.com"
+                );
+
+                System.out.println(
+                    "Password: admin123"
+                );
+
+                System.out.println(
+                    "================================="
+                );
+
+            } else {
+
+                System.out.println(
+                    "================================="
+                );
+
+                System.out.println(
+                    "DEFAULT ADMIN ALREADY EXISTS"
+                );
+
+                System.out.println(
+                    "================================="
+                );
+>>>>>>> be2f73b (booking)
             }
         };
     }

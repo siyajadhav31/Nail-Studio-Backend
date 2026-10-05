@@ -5,6 +5,8 @@ import com.siya.repository.AdminRepository;
 
 import jakarta.servlet.http.HttpSession;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +25,13 @@ public class AdminController {
 
     private final AdminRepository adminRepository;
 
+
+    // ==========================================
+    // CONSTRUCTOR
+    // ==========================================
+
     public AdminController(AdminRepository adminRepository) {
+
         this.adminRepository = adminRepository;
     }
 
@@ -33,78 +41,154 @@ public class AdminController {
     // ==========================================
 
     @PostMapping("/login")
-    public String loginAdmin(
+    public ResponseEntity<String> loginAdmin(
             @RequestBody Admin admin,
             HttpSession session) {
 
         System.out.println("=================================");
         System.out.println("ADMIN LOGIN REQUEST");
-        System.out.println("Email received: [" + admin.getEmail() + "]");
-        System.out.println("Password received: [" + admin.getPassword() + "]");
+        System.out.println("=================================");
+
+        System.out.println(
+            "Email received: [" +
+            admin.getEmail() +
+            "]"
+        );
+
+        System.out.println(
+            "Password received: [" +
+            admin.getPassword() +
+            "]"
+        );
+
         System.out.println("=================================");
 
 
-        // Get all admins from database
-        List<Admin> admins = adminRepository.findAll();
+        // ------------------------------------------
+        // GET ALL ADMINS
+        // ------------------------------------------
+
+        List<Admin> admins =
+                adminRepository.findAll();
+
 
         Admin existingAdmin = null;
 
 
-        // Find admin by email
+        // ------------------------------------------
+        // FIND ADMIN BY EMAIL
+        // ------------------------------------------
+
         for (Admin a : admins) {
 
             if (a.getEmail() != null
                     && admin.getEmail() != null
-                    && a.getEmail().trim()
-                        .equalsIgnoreCase(admin.getEmail().trim())) {
+                    && a.getEmail()
+                        .trim()
+                        .equalsIgnoreCase(
+                            admin.getEmail().trim()
+                        )) {
 
                 existingAdmin = a;
+
                 break;
             }
         }
 
 
-        // Admin not found
+        // ------------------------------------------
+        // ADMIN NOT FOUND
+        // ------------------------------------------
+
         if (existingAdmin == null) {
 
-            System.out.println("ADMIN NOT FOUND");
+            System.out.println(
+                "ADMIN NOT FOUND"
+            );
 
-            return "Admin not found";
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("Admin not found");
         }
 
 
-        System.out.println("ADMIN FOUND");
+        // ------------------------------------------
+        // ADMIN FOUND
+        // ------------------------------------------
+
         System.out.println(
-            "Database email: [" + existingAdmin.getEmail() + "]"
+            "ADMIN FOUND"
+        );
+
+        System.out.println(
+            "Database email: [" +
+            existingAdmin.getEmail() +
+            "]"
         );
 
 
-        // Check password
+        // ------------------------------------------
+        // CHECK PASSWORD
+        // ------------------------------------------
+
         if (existingAdmin.getPassword() == null
+                || admin.getPassword() == null
                 || !existingAdmin.getPassword()
                     .equals(admin.getPassword())) {
 
-            System.out.println("INVALID PASSWORD");
+            System.out.println(
+                "INVALID PASSWORD"
+            );
 
-            return "Invalid admin password";
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("Invalid admin password");
         }
 
 
-        // Create session
+        // ------------------------------------------
+        // CREATE ADMIN SESSION
+        // ------------------------------------------
+
         session.setAttribute(
-                "adminEmail",
-                existingAdmin.getEmail()
+            "adminEmail",
+            existingAdmin.getEmail()
         );
 
         session.setAttribute(
-                "adminLoggedIn",
-                true
+            "adminLoggedIn",
+            true
         );
 
 
-        System.out.println("ADMIN LOGIN SUCCESS");
+        // ------------------------------------------
+        // DEBUG SESSION
+        // ------------------------------------------
 
-        return "Admin login successful";
+        System.out.println(
+            "SESSION ID: " +
+            session.getId()
+        );
+
+        System.out.println(
+            "ADMIN EMAIL SESSION: " +
+            session.getAttribute("adminEmail")
+        );
+
+        System.out.println(
+            "ADMIN LOGGED IN SESSION: " +
+            session.getAttribute("adminLoggedIn")
+        );
+
+        System.out.println(
+            "ADMIN LOGIN SUCCESS"
+        );
+
+        System.out.println("=================================");
+
+
+        return ResponseEntity
+                .ok("Admin login successful");
     }
 
 
@@ -124,19 +208,68 @@ public class AdminController {
     // ==========================================
 
     @GetMapping("/check")
-    public String checkAdminSession(
+    public ResponseEntity<String> checkAdminSession(
             HttpSession session) {
 
+        System.out.println("=================================");
+        System.out.println("ADMIN SESSION CHECK");
+        System.out.println("Session ID: " + session.getId());
+
+
         Object adminLoggedIn =
-                session.getAttribute("adminLoggedIn");
+                session.getAttribute(
+                    "adminLoggedIn"
+                );
 
-        if (adminLoggedIn != null
-                && (Boolean) adminLoggedIn) {
 
-            return "Admin authenticated";
+        Object adminEmail =
+                session.getAttribute(
+                    "adminEmail"
+                );
+
+
+        System.out.println(
+            "adminLoggedIn: " +
+            adminLoggedIn
+        );
+
+        System.out.println(
+            "adminEmail: " +
+            adminEmail
+        );
+
+
+        // ------------------------------------------
+        // SESSION VALID
+        // ------------------------------------------
+
+        if (Boolean.TRUE.equals(adminLoggedIn)) {
+
+            System.out.println(
+                "ADMIN AUTHENTICATED"
+            );
+
+            System.out.println("=================================");
+
+            return ResponseEntity
+                    .ok("Admin authenticated");
         }
 
-        return "Admin not authenticated";
+
+        // ------------------------------------------
+        // SESSION INVALID
+        // ------------------------------------------
+
+        System.out.println(
+            "ADMIN NOT AUTHENTICATED"
+        );
+
+        System.out.println("=================================");
+
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body("Admin not authenticated");
     }
 
 
@@ -145,12 +278,28 @@ public class AdminController {
     // ==========================================
 
     @PostMapping("/logout")
-    public String logoutAdmin(
+    public ResponseEntity<String> logoutAdmin(
             HttpSession session) {
+
+        System.out.println("=================================");
+        System.out.println("ADMIN LOGOUT");
+        System.out.println(
+            "Session ID: " +
+            session.getId()
+        );
+
 
         session.invalidate();
 
-        return "Admin logout successful";
-    }
 
+        System.out.println(
+            "ADMIN LOGOUT SUCCESS"
+        );
+
+        System.out.println("=================================");
+
+
+        return ResponseEntity
+                .ok("Admin logout successful");
+    }
 }

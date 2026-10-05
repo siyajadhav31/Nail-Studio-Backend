@@ -15,20 +15,20 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class SecurityConfig {
 
-    // =====================================================
+    // ==========================================
     // USER DETAILS MANAGER
-    // Prevent Spring Security from creating default user
-    // =====================================================
+    // ==========================================
 
     @Bean
     public UserDetailsManager userDetailsManager() {
+
         return new InMemoryUserDetailsManager();
     }
 
 
-    // =====================================================
+    // ==========================================
     // SECURITY FILTER CHAIN
-    // =====================================================
+    // ==========================================
 
     @Bean
     public SecurityFilterChain securityFilterChain(
@@ -36,70 +36,68 @@ public class SecurityConfig {
 
         http
 
-            // =================================================
+            // ------------------------------------------
             // CSRF
-            // =================================================
+            // ------------------------------------------
 
             .csrf(csrf -> csrf.disable())
 
 
-            // =================================================
+            // ------------------------------------------
             // CORS
-            // =================================================
+            // ------------------------------------------
 
             .cors(cors -> cors.configurationSource(
                     corsConfigurationSource()
             ))
 
 
-            // =================================================
+            // ------------------------------------------
             // AUTHORIZATION
-            // =================================================
+            // ------------------------------------------
 
             .authorizeHttpRequests(auth -> auth
 
-                // -----------------------------
-                // ADMIN APIs
-                // -----------------------------
-
+                // Admin login
                 .requestMatchers(
-                    "/api/admin/login",
-                    "/api/admin/check",
+                    "/api/admin/login"
+                ).permitAll()
+
+                // Admin session check
+                .requestMatchers(
+                    "/api/admin/check"
+                ).permitAll()
+
+                // Admin logout
+                .requestMatchers(
                     "/api/admin/logout"
                 ).permitAll()
 
-
-                // -----------------------------
-                // BOOKING APIs
-                // -----------------------------
-
+                // All booking APIs
                 .requestMatchers(
                     "/api/bookings/**"
                 ).permitAll()
 
-
-                // -----------------------------
-                // ALL OTHER API
-                // -----------------------------
-
+                // Other APIs
                 .requestMatchers(
                     "/api/**"
                 ).permitAll()
 
-
-                // -----------------------------
-                // OTHER REQUESTS
-                // -----------------------------
-
+                // Everything else
                 .anyRequest().permitAll()
             )
 
 
-            // =================================================
-            // DISABLE SPRING DEFAULT LOGIN
-            // =================================================
+            // ------------------------------------------
+            // FORM LOGIN DISABLED
+            // ------------------------------------------
 
             .formLogin(form -> form.disable())
+
+
+            // ------------------------------------------
+            // BASIC AUTH DISABLED
+            // ------------------------------------------
 
             .httpBasic(basic -> basic.disable());
 
@@ -108,9 +106,9 @@ public class SecurityConfig {
     }
 
 
-    // =====================================================
+    // ==========================================
     // CORS CONFIGURATION
-    // =====================================================
+    // ==========================================
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -119,25 +117,29 @@ public class SecurityConfig {
                 new CorsConfiguration();
 
 
-        // =================================================
+        // ------------------------------------------
         // ALLOWED FRONTEND ORIGINS
-        // =================================================
+        // ------------------------------------------
 
         configuration.setAllowedOrigins(
             Arrays.asList(
+
                 "http://localhost:5500",
+
                 "http://127.0.0.1:5500",
+
                 "https://siyajadhav31.github.io"
             )
         );
 
 
-        // =================================================
-        // ALLOWED HTTP METHODS
-        // =================================================
+        // ------------------------------------------
+        // ALLOWED METHODS
+        // ------------------------------------------
 
         configuration.setAllowedMethods(
             Arrays.asList(
+
                 "GET",
                 "POST",
                 "PUT",
@@ -147,25 +149,25 @@ public class SecurityConfig {
         );
 
 
-        // =================================================
+        // ------------------------------------------
         // ALLOWED HEADERS
-        // =================================================
+        // ------------------------------------------
 
         configuration.setAllowedHeaders(
             Arrays.asList("*")
         );
 
 
-        // =================================================
-        // ALLOW SESSION COOKIES
-        // =================================================
+        // ------------------------------------------
+        // ALLOW COOKIES / SESSION
+        // ------------------------------------------
 
         configuration.setAllowCredentials(true);
 
 
-        // =================================================
+        // ------------------------------------------
         // REGISTER CORS
-        // =================================================
+        // ------------------------------------------
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
