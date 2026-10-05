@@ -1,4 +1,3 @@
-
 package com.siya.controller;
 
 import com.siya.entity.Booking;
@@ -22,18 +21,13 @@ public class BookingController {
 
     private final BookingRepository bookingRepository;
 
-
     // ==========================================
     // CONSTRUCTOR
     // ==========================================
 
-    public BookingController(
-            BookingRepository bookingRepository) {
-
-        this.bookingRepository =
-                bookingRepository;
+    public BookingController(BookingRepository bookingRepository) {
+        this.bookingRepository = bookingRepository;
     }
-
 
 
     // ==========================================
@@ -41,73 +35,47 @@ public class BookingController {
     // ==========================================
 
     @PostMapping
-    public Booking createBooking(
-            @RequestBody Booking booking) {
+    public Booking createBooking(@RequestBody Booking booking) {
+
+        System.out.println("=================================");
+        System.out.println("💅 NEW BOOKING RECEIVED");
+
+        System.out.println("Name: " + booking.getName());
+        System.out.println("Email: " + booking.getEmail());
+        System.out.println("Phone: " + booking.getPhone());
+        System.out.println("Service: " + booking.getService());
 
         System.out.println(
-                "================================="
+            "Booking Date: " + booking.getBookingDate()
         );
 
         System.out.println(
-                "💅 NEW BOOKING RECEIVED"
+            "Booking Time: " + booking.getBookingTime()
         );
 
         System.out.println(
-                "Name: " + booking.getName()
+            "Booking Type: " + booking.getBookingType()
         );
 
         System.out.println(
-                "Email: " + booking.getEmail()
+            "Design: " + booking.getDesign()
         );
 
         System.out.println(
-                "Phone: " + booking.getPhone()
+            "Shape: " + booking.getShape()
         );
 
         System.out.println(
-                "Service: " + booking.getService()
+            "Shade: " + booking.getShade()
         );
 
         System.out.println(
-                "Booking Date: " +
-                booking.getBookingDate()
+            "Notes: " + booking.getNotes()
         );
 
         System.out.println(
-                "Booking Time: " +
-                booking.getBookingTime()
+            "Payment Method: " + booking.getPaymentMethod()
         );
-
-        System.out.println(
-                "Booking Type: " +
-                booking.getBookingType()
-        );
-
-        System.out.println(
-                "Design: " +
-                booking.getDesign()
-        );
-
-        System.out.println(
-                "Shape: " +
-                booking.getShape()
-        );
-
-        System.out.println(
-                "Shade: " +
-                booking.getShade()
-        );
-
-        System.out.println(
-                "Notes: " +
-                booking.getNotes()
-        );
-
-        System.out.println(
-                "Payment Method: " +
-                booking.getPaymentMethod()
-        );
-
 
 
         // ==========================================
@@ -116,16 +84,11 @@ public class BookingController {
 
         if (
             booking.getBookingDate() == null ||
-            booking.getBookingDate()
-                    .trim()
-                    .isEmpty()
+            booking.getBookingDate().trim().isEmpty()
         ) {
 
-            System.out.println(
-                    "⚠️ Booking date missing"
-            );
+            System.out.println("⚠️ Booking date missing");
         }
-
 
 
         // ==========================================
@@ -134,16 +97,11 @@ public class BookingController {
 
         if (
             booking.getBookingTime() == null ||
-            booking.getBookingTime()
-                    .trim()
-                    .isEmpty()
+            booking.getBookingTime().trim().isEmpty()
         ) {
 
-            System.out.println(
-                    "⚠️ Booking time missing"
-            );
+            System.out.println("⚠️ Booking time missing");
         }
-
 
 
         // ==========================================
@@ -152,9 +110,7 @@ public class BookingController {
 
         if (
             booking.getBookingType() == null ||
-            booking.getBookingType()
-                    .trim()
-                    .isEmpty()
+            booking.getBookingType().trim().isEmpty()
         ) {
 
             /*
@@ -164,30 +120,25 @@ public class BookingController {
             if (
                 booking.getNotes() != null &&
                 booking.getNotes()
-                        .toLowerCase()
-                        .contains("virtual preview")
+                    .toLowerCase()
+                    .contains("virtual preview")
             ) {
 
-                booking.setBookingType(
-                        "VIRTUAL"
-                );
+                booking.setBookingType("VIRTUAL");
 
             } else {
 
-                booking.setBookingType(
-                        "SERVICE"
-                );
+                booking.setBookingType("SERVICE");
             }
 
         } else {
 
             booking.setBookingType(
-                    booking.getBookingType()
-                            .trim()
-                            .toUpperCase()
+                booking.getBookingType()
+                    .trim()
+                    .toUpperCase()
             );
         }
-
 
 
         // ==========================================
@@ -196,24 +147,19 @@ public class BookingController {
 
         if (
             booking.getPaymentMethod() == null ||
-            booking.getPaymentMethod()
-                    .trim()
-                    .isEmpty()
+            booking.getPaymentMethod().trim().isEmpty()
         ) {
 
-            booking.setPaymentMethod(
-                    "CASH"
-            );
+            booking.setPaymentMethod("CASH");
 
         } else {
 
             booking.setPaymentMethod(
-                    booking.getPaymentMethod()
-                            .trim()
-                            .toUpperCase()
+                booking.getPaymentMethod()
+                    .trim()
+                    .toUpperCase()
             );
         }
-
 
 
         // ==========================================
@@ -221,14 +167,68 @@ public class BookingController {
         // ==========================================
 
         /*
-         * Since we are no longer using Razorpay,
-         * the booking is directly confirmed.
+         * We are not using Razorpay now.
+         * Therefore booking is directly confirmed.
          */
 
-        booking.setPaymentStatus(
-                "CONFIRMED"
-        );
+        booking.setPaymentStatus("CONFIRMED");
 
+
+        // ==========================================
+        // SERVICE PRICE
+        // ==========================================
+
+        /*
+         * Backend decides the actual service price.
+         * This is safer than trusting the price
+         * coming from the frontend.
+         */
+
+        String service = booking.getService();
+
+        if (service != null) {
+
+            service = service.trim();
+
+            switch (service) {
+
+                case "Acrylic Extensions + Gel Polish":
+                    booking.setPaymentAmount(1800.0);
+                    break;
+
+                case "Hands Gel Polish":
+                    booking.setPaymentAmount(699.0);
+                    break;
+
+                case "Bridal Nails":
+                    booking.setPaymentAmount(2499.0);
+                    break;
+
+                case "Temporary Nails + Gel Polish":
+                    booking.setPaymentAmount(1199.0);
+                    break;
+
+                case "Burgundy Nails":
+                    booking.setPaymentAmount(1299.0);
+                    break;
+
+                case "French Nails":
+                    booking.setPaymentAmount(999.0);
+                    break;
+
+                case "Rouge Nails":
+                    booking.setPaymentAmount(1399.0);
+                    break;
+
+                case "Polka Dot Nails":
+                    booking.setPaymentAmount(1099.0);
+                    break;
+
+                default:
+                    booking.setPaymentAmount(0.0);
+                    break;
+            }
+        }
 
 
         // ==========================================
@@ -236,57 +236,55 @@ public class BookingController {
         // ==========================================
 
         Booking savedBooking =
-                bookingRepository.save(booking);
+            bookingRepository.save(booking);
 
 
+        // ==========================================
+        // SUCCESS LOG
+        // ==========================================
+
+        System.out.println("=================================");
+        System.out.println("✅ BOOKING SAVED");
 
         System.out.println(
-                "================================="
+            "ID: " + savedBooking.getId()
         );
 
         System.out.println(
-                "✅ BOOKING SAVED"
+            "Type: " + savedBooking.getBookingType()
         );
 
         System.out.println(
-                "ID: " +
-                savedBooking.getId()
+            "Service: " + savedBooking.getService()
         );
 
         System.out.println(
-                "Type: " +
-                savedBooking.getBookingType()
+            "Amount: ₹" + savedBooking.getPaymentAmount()
         );
 
         System.out.println(
-                "Date: " +
-                savedBooking.getBookingDate()
+            "Date: " + savedBooking.getBookingDate()
         );
 
         System.out.println(
-                "Time: " +
-                savedBooking.getBookingTime()
+            "Time: " + savedBooking.getBookingTime()
         );
 
         System.out.println(
-                "Payment Method: " +
-                savedBooking.getPaymentMethod()
+            "Payment Method: " +
+            savedBooking.getPaymentMethod()
         );
 
         System.out.println(
-                "Payment Status: " +
-                savedBooking.getPaymentStatus()
+            "Payment Status: " +
+            savedBooking.getPaymentStatus()
         );
 
-        System.out.println(
-                "================================="
-        );
-
+        System.out.println("=================================");
 
 
         return savedBooking;
     }
-
 
 
     // ==========================================
@@ -298,7 +296,6 @@ public class BookingController {
 
         return bookingRepository.findAll();
     }
-
 
 
     // ==========================================
@@ -315,7 +312,6 @@ public class BookingController {
     }
 
 
-
     // ==========================================
     // UPDATE BOOKING
     // ==========================================
@@ -326,17 +322,14 @@ public class BookingController {
             @RequestBody Booking updatedBooking) {
 
         Booking existingBooking =
-                bookingRepository
-                        .findById(id)
-                        .orElse(null);
-
+            bookingRepository
+                .findById(id)
+                .orElse(null);
 
 
         if (existingBooking == null) {
-
             return null;
         }
-
 
 
         // ==========================================
@@ -344,21 +337,20 @@ public class BookingController {
         // ==========================================
 
         existingBooking.setName(
-                updatedBooking.getName()
+            updatedBooking.getName()
         );
 
         existingBooking.setEmail(
-                updatedBooking.getEmail()
+            updatedBooking.getEmail()
         );
 
         existingBooking.setPhone(
-                updatedBooking.getPhone()
+            updatedBooking.getPhone()
         );
 
         existingBooking.setService(
-                updatedBooking.getService()
+            updatedBooking.getService()
         );
-
 
 
         // ==========================================
@@ -368,19 +360,70 @@ public class BookingController {
         if (
             updatedBooking.getPaymentMethod() != null &&
             !updatedBooking
-                    .getPaymentMethod()
-                    .trim()
-                    .isEmpty()
+                .getPaymentMethod()
+                .trim()
+                .isEmpty()
         ) {
 
             existingBooking.setPaymentMethod(
-                    updatedBooking
-                            .getPaymentMethod()
-                            .trim()
-                            .toUpperCase()
+                updatedBooking
+                    .getPaymentMethod()
+                    .trim()
+                    .toUpperCase()
             );
         }
 
+
+        // ==========================================
+        // PAYMENT AMOUNT
+        // ==========================================
+
+        String service =
+            updatedBooking.getService();
+
+        if (service != null) {
+
+            service = service.trim();
+
+            switch (service) {
+
+                case "Acrylic Extensions + Gel Polish":
+                    existingBooking.setPaymentAmount(1800.0);
+                    break;
+
+                case "Hands Gel Polish":
+                    existingBooking.setPaymentAmount(699.0);
+                    break;
+
+                case "Bridal Nails":
+                    existingBooking.setPaymentAmount(2499.0);
+                    break;
+
+                case "Temporary Nails + Gel Polish":
+                    existingBooking.setPaymentAmount(1199.0);
+                    break;
+
+                case "Burgundy Nails":
+                    existingBooking.setPaymentAmount(1299.0);
+                    break;
+
+                case "French Nails":
+                    existingBooking.setPaymentAmount(999.0);
+                    break;
+
+                case "Rouge Nails":
+                    existingBooking.setPaymentAmount(1399.0);
+                    break;
+
+                case "Polka Dot Nails":
+                    existingBooking.setPaymentAmount(1099.0);
+                    break;
+
+                default:
+                    existingBooking.setPaymentAmount(0.0);
+                    break;
+            }
+        }
 
 
         // ==========================================
@@ -388,21 +431,20 @@ public class BookingController {
         // ==========================================
 
         existingBooking.setDesign(
-                updatedBooking.getDesign()
+            updatedBooking.getDesign()
         );
 
         existingBooking.setShape(
-                updatedBooking.getShape()
+            updatedBooking.getShape()
         );
 
         existingBooking.setShade(
-                updatedBooking.getShade()
+            updatedBooking.getShade()
         );
 
         existingBooking.setNotes(
-                updatedBooking.getNotes()
+            updatedBooking.getNotes()
         );
-
 
 
         // ==========================================
@@ -414,10 +456,9 @@ public class BookingController {
         ) {
 
             existingBooking.setBookingDate(
-                    updatedBooking.getBookingDate()
+                updatedBooking.getBookingDate()
             );
         }
-
 
 
         // ==========================================
@@ -429,10 +470,9 @@ public class BookingController {
         ) {
 
             existingBooking.setBookingTime(
-                    updatedBooking.getBookingTime()
+                updatedBooking.getBookingTime()
             );
         }
-
 
 
         // ==========================================
@@ -442,19 +482,18 @@ public class BookingController {
         if (
             updatedBooking.getBookingType() != null &&
             !updatedBooking
-                    .getBookingType()
-                    .trim()
-                    .isEmpty()
+                .getBookingType()
+                .trim()
+                .isEmpty()
         ) {
 
             existingBooking.setBookingType(
-                    updatedBooking
-                            .getBookingType()
-                            .trim()
-                            .toUpperCase()
+                updatedBooking
+                    .getBookingType()
+                    .trim()
+                    .toUpperCase()
             );
         }
-
 
 
         // ==========================================
@@ -462,39 +501,37 @@ public class BookingController {
         // ==========================================
 
         Booking savedBooking =
-                bookingRepository.save(
-                        existingBooking
-                );
+            bookingRepository.save(
+                existingBooking
+            );
 
 
+        System.out.println("=================================");
+        System.out.println("💅 BOOKING UPDATED");
 
         System.out.println(
-                "================================="
+            "ID: " + savedBooking.getId()
         );
 
         System.out.println(
-                "💅 BOOKING UPDATED"
+            "Service: " + savedBooking.getService()
         );
 
         System.out.println(
-                "ID: " +
-                savedBooking.getId()
+            "Amount: ₹" +
+            savedBooking.getPaymentAmount()
         );
 
         System.out.println(
-                "Payment Method: " +
-                savedBooking.getPaymentMethod()
+            "Payment Method: " +
+            savedBooking.getPaymentMethod()
         );
 
-        System.out.println(
-                "================================="
-        );
-
+        System.out.println("=================================");
 
 
         return savedBooking;
     }
-
 
 
     // ==========================================
@@ -505,18 +542,12 @@ public class BookingController {
     public String deleteBooking(
             @PathVariable Long id) {
 
-        System.out.println(
-                "================================="
-        );
+        System.out.println("=================================");
+        System.out.println("🗑 DELETE BOOKING REQUEST");
 
         System.out.println(
-                "🗑 DELETE BOOKING REQUEST"
+            "Booking ID: " + id
         );
-
-        System.out.println(
-                "Booking ID: " + id
-        );
-
 
 
         // ==========================================
@@ -528,16 +559,15 @@ public class BookingController {
         ) {
 
             System.out.println(
-                    "❌ BOOKING NOT FOUND"
+                "❌ BOOKING NOT FOUND"
             );
 
             System.out.println(
-                    "================================="
+                "================================="
             );
 
             return "Booking not found";
         }
-
 
 
         // ==========================================
@@ -547,23 +577,19 @@ public class BookingController {
         bookingRepository.deleteById(id);
 
 
-
         System.out.println(
-                "✅ BOOKING DELETED"
+            "✅ BOOKING DELETED"
         );
 
         System.out.println(
-                "Deleted ID: " + id
+            "Deleted ID: " + id
         );
 
         System.out.println(
-                "================================="
+            "================================="
         );
-
 
 
         return "Booking deleted successfully";
     }
-
 }
-
