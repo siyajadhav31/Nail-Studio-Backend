@@ -1,6 +1,7 @@
 package com.siya.entity;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -36,12 +37,34 @@ public class Booking {
     private String bookingType;
 
     private String notes;
-    
+
+    // ==========================================
+    // PAYMENT METHOD
+    // ==========================================
+
+    private String paymentMethod;
+
+    // ==========================================
+    // PAYMENT STATUS
+    // ==========================================
+
     private String paymentStatus;
+
+    // ==========================================
+    // RAZORPAY PAYMENT ID
+    // ==========================================
 
     private String paymentId;
 
+    // ==========================================
+    // RAZORPAY ORDER ID
+    // ==========================================
+
     private String razorpayOrderId;
+
+    // ==========================================
+    // PAYMENT AMOUNT
+    // ==========================================
 
     private Double paymentAmount;
 
@@ -51,6 +74,7 @@ public class Booking {
     // ==========================================
 
     public Booking() {
+
     }
 
 
@@ -59,7 +83,9 @@ public class Booking {
     // ==========================================
 
     public Long getId() {
+
         return id;
+
     }
 
 
@@ -68,11 +94,15 @@ public class Booking {
     // ==========================================
 
     public String getName() {
+
         return name;
+
     }
 
     public void setName(String name) {
+
         this.name = name;
+
     }
 
 
@@ -81,11 +111,15 @@ public class Booking {
     // ==========================================
 
     public String getEmail() {
+
         return email;
+
     }
 
     public void setEmail(String email) {
+
         this.email = email;
+
     }
 
 
@@ -94,11 +128,15 @@ public class Booking {
     // ==========================================
 
     public String getPhone() {
+
         return phone;
+
     }
 
     public void setPhone(String phone) {
+
         this.phone = phone;
+
     }
 
 
@@ -107,11 +145,15 @@ public class Booking {
     // ==========================================
 
     public String getService() {
+
         return service;
+
     }
 
     public void setService(String service) {
+
         this.service = service;
+
     }
 
 
@@ -120,11 +162,15 @@ public class Booking {
     // ==========================================
 
     public String getDesign() {
+
         return design;
+
     }
 
     public void setDesign(String design) {
+
         this.design = design;
+
     }
 
 
@@ -133,11 +179,15 @@ public class Booking {
     // ==========================================
 
     public String getShape() {
+
         return shape;
+
     }
 
     public void setShape(String shape) {
+
         this.shape = shape;
+
     }
 
 
@@ -146,11 +196,15 @@ public class Booking {
     // ==========================================
 
     public String getShade() {
+
         return shade;
+
     }
 
     public void setShade(String shade) {
+
         this.shade = shade;
+
     }
 
 
@@ -159,11 +213,15 @@ public class Booking {
     // ==========================================
 
     public String getBookingDate() {
+
         return bookingDate;
+
     }
 
     public void setBookingDate(String bookingDate) {
+
         this.bookingDate = bookingDate;
+
     }
 
 
@@ -172,11 +230,15 @@ public class Booking {
     // ==========================================
 
     public String getBookingTime() {
+
         return bookingTime;
+
     }
 
     public void setBookingTime(String bookingTime) {
+
         this.bookingTime = bookingTime;
+
     }
 
 
@@ -185,11 +247,15 @@ public class Booking {
     // ==========================================
 
     public String getBookingType() {
+
         return bookingType;
+
     }
 
     public void setBookingType(String bookingType) {
+
         this.bookingType = bookingType;
+
     }
 
 
@@ -198,61 +264,100 @@ public class Booking {
     // ==========================================
 
     public String getNotes() {
+
         return notes;
+
     }
 
     public void setNotes(String notes) {
+
         this.notes = notes;
+
     }
-    
- // ==========================================
- // PAYMENT STATUS
- // ==========================================
-
- public String getPaymentStatus() {
-     return paymentStatus;
- }
-
- public void setPaymentStatus(String paymentStatus) {
-     this.paymentStatus = paymentStatus;
- }
 
 
- // ==========================================
- // PAYMENT ID
- // ==========================================
+    // ==========================================
+    // PAYMENT METHOD
+    // ==========================================
 
- public String getPaymentId() {
-     return paymentId;
- }
+    public String getPaymentMethod() {
 
- public void setPaymentId(String paymentId) {
-     this.paymentId = paymentId;
- }
+        return paymentMethod;
 
+    }
 
- // ==========================================
- // RAZORPAY ORDER ID
- // ==========================================
+    public void setPaymentMethod(String paymentMethod) {
 
- public String getRazorpayOrderId() {
-     return razorpayOrderId;
- }
+        this.paymentMethod = paymentMethod;
 
- public void setRazorpayOrderId(String razorpayOrderId) {
-     this.razorpayOrderId = razorpayOrderId;
- }
+    }
 
 
- // ==========================================
- // PAYMENT AMOUNT
- // ==========================================
+    // ==========================================
+    // PAYMENT STATUS
+    // ==========================================
 
- public Double getPaymentAmount() {
-     return paymentAmount;
- }
+    public String getPaymentStatus() {
 
- public void setPaymentAmount(Double paymentAmount) {
-     this.paymentAmount = paymentAmount;
- }
+        return paymentStatus;
+
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+
+        this.paymentStatus = paymentStatus;
+
+    }
+
+
+    // ==========================================
+    // PAYMENT ID
+    // ==========================================
+
+    public String getPaymentId() {
+
+        return paymentId;
+
+    }
+
+    public void setPaymentId(String paymentId) {
+
+        this.paymentId = paymentId;
+
+    }
+
+
+    // ==========================================
+    // RAZORPAY ORDER ID
+    // ==========================================
+
+    public String getRazorpayOrderId() {
+
+        return razorpayOrderId;
+
+    }
+
+    public void setRazorpayOrderId(String razorpayOrderId) {
+
+        this.razorpayOrderId = razorpayOrderId;
+
+    }
+
+
+    // ==========================================
+    // PAYMENT AMOUNT
+    // ==========================================
+
+    public Double getPaymentAmount() {
+
+        return paymentAmount;
+
+    }
+
+    public void setPaymentAmount(Double paymentAmount) {
+
+        this.paymentAmount = paymentAmount;
+
+    }
+
 }

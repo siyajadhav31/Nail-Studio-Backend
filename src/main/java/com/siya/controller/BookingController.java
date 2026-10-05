@@ -1,3 +1,4 @@
+
 package com.siya.controller;
 
 import com.siya.entity.Booking;
@@ -32,6 +33,7 @@ public class BookingController {
         this.bookingRepository =
                 bookingRepository;
     }
+
 
 
     // ==========================================
@@ -101,6 +103,12 @@ public class BookingController {
                 booking.getNotes()
         );
 
+        System.out.println(
+                "Payment Method: " +
+                booking.getPaymentMethod()
+        );
+
+
 
         // ==========================================
         // DATE CHECK
@@ -119,6 +127,7 @@ public class BookingController {
         }
 
 
+
         // ==========================================
         // TIME CHECK
         // ==========================================
@@ -134,6 +143,7 @@ public class BookingController {
                     "⚠️ Booking time missing"
             );
         }
+
 
 
         // ==========================================
@@ -179,12 +189,55 @@ public class BookingController {
         }
 
 
+
+        // ==========================================
+        // PAYMENT METHOD
+        // ==========================================
+
+        if (
+            booking.getPaymentMethod() == null ||
+            booking.getPaymentMethod()
+                    .trim()
+                    .isEmpty()
+        ) {
+
+            booking.setPaymentMethod(
+                    "CASH"
+            );
+
+        } else {
+
+            booking.setPaymentMethod(
+                    booking.getPaymentMethod()
+                            .trim()
+                            .toUpperCase()
+            );
+        }
+
+
+
+        // ==========================================
+        // PAYMENT STATUS
+        // ==========================================
+
+        /*
+         * Since we are no longer using Razorpay,
+         * the booking is directly confirmed.
+         */
+
+        booking.setPaymentStatus(
+                "CONFIRMED"
+        );
+
+
+
         // ==========================================
         // SAVE BOOKING
         // ==========================================
 
         Booking savedBooking =
                 bookingRepository.save(booking);
+
 
 
         System.out.println(
@@ -216,12 +269,24 @@ public class BookingController {
         );
 
         System.out.println(
+                "Payment Method: " +
+                savedBooking.getPaymentMethod()
+        );
+
+        System.out.println(
+                "Payment Status: " +
+                savedBooking.getPaymentStatus()
+        );
+
+        System.out.println(
                 "================================="
         );
 
 
+
         return savedBooking;
     }
+
 
 
     // ==========================================
@@ -233,6 +298,7 @@ public class BookingController {
 
         return bookingRepository.findAll();
     }
+
 
 
     // ==========================================
@@ -247,6 +313,7 @@ public class BookingController {
                 .findById(id)
                 .orElse(null);
     }
+
 
 
     // ==========================================
@@ -264,10 +331,12 @@ public class BookingController {
                         .orElse(null);
 
 
+
         if (existingBooking == null) {
 
             return null;
         }
+
 
 
         // ==========================================
@@ -291,6 +360,29 @@ public class BookingController {
         );
 
 
+
+        // ==========================================
+        // PAYMENT METHOD
+        // ==========================================
+
+        if (
+            updatedBooking.getPaymentMethod() != null &&
+            !updatedBooking
+                    .getPaymentMethod()
+                    .trim()
+                    .isEmpty()
+        ) {
+
+            existingBooking.setPaymentMethod(
+                    updatedBooking
+                            .getPaymentMethod()
+                            .trim()
+                            .toUpperCase()
+            );
+        }
+
+
+
         // ==========================================
         // VIRTUAL DETAILS
         // ==========================================
@@ -312,6 +404,7 @@ public class BookingController {
         );
 
 
+
         // ==========================================
         // DATE
         // ==========================================
@@ -326,6 +419,7 @@ public class BookingController {
         }
 
 
+
         // ==========================================
         // TIME
         // ==========================================
@@ -338,6 +432,7 @@ public class BookingController {
                     updatedBooking.getBookingTime()
             );
         }
+
 
 
         // ==========================================
@@ -361,6 +456,7 @@ public class BookingController {
         }
 
 
+
         // ==========================================
         // SAVE UPDATED BOOKING
         // ==========================================
@@ -369,6 +465,7 @@ public class BookingController {
                 bookingRepository.save(
                         existingBooking
                 );
+
 
 
         System.out.println(
@@ -385,12 +482,19 @@ public class BookingController {
         );
 
         System.out.println(
+                "Payment Method: " +
+                savedBooking.getPaymentMethod()
+        );
+
+        System.out.println(
                 "================================="
         );
 
 
+
         return savedBooking;
     }
+
 
 
     // ==========================================
@@ -414,6 +518,7 @@ public class BookingController {
         );
 
 
+
         // ==========================================
         // CHECK BOOKING
         // ==========================================
@@ -434,11 +539,13 @@ public class BookingController {
         }
 
 
+
         // ==========================================
         // DELETE
         // ==========================================
 
         bookingRepository.deleteById(id);
+
 
 
         System.out.println(
@@ -454,7 +561,9 @@ public class BookingController {
         );
 
 
+
         return "Booking deleted successfully";
     }
 
 }
+
