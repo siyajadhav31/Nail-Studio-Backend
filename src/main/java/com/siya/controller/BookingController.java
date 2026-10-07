@@ -13,13 +13,16 @@ import java.util.List;
     origins = {
         "https://siyajadhav31.github.io",
         "http://localhost:5500",
-        "http://127.0.0.1:5500"
+        "http://127.0.0.1:5500",
+        "http://localhost:5501",
+        "http://127.0.0.1:5501"
     },
     allowCredentials = "true"
 )
 public class BookingController {
 
     private final BookingRepository bookingRepository;
+
 
     // ==========================================
     // CONSTRUCTOR
@@ -182,6 +185,11 @@ public class BookingController {
         System.out.println("=================================");
         System.out.println("💅 NEW BOOKING RECEIVED");
 
+
+        // ==========================================
+        // BASIC DETAILS
+        // ==========================================
+
         System.out.println("Name: " + booking.getName());
         System.out.println("Email: " + booking.getEmail());
         System.out.println("Phone: " + booking.getPhone());
@@ -225,6 +233,16 @@ public class BookingController {
         System.out.println(
             "Payment Method: " +
             booking.getPaymentMethod()
+        );
+
+        System.out.println(
+            "Payment Status From Frontend: " +
+            booking.getPaymentStatus()
+        );
+
+        System.out.println(
+            "Payment Amount From Frontend: " +
+            booking.getPaymentAmount()
         );
 
 
@@ -291,25 +309,128 @@ public class BookingController {
         // ==========================================
 
         /*
-         * No Razorpay is being used.
+         * IMPORTANT:
          *
-         * Therefore the appointment is directly
-         * marked as CONFIRMED.
+         * Do NOT overwrite PAID coming from frontend.
+         *
+         * Google Pay / UPI  -> PAID
+         * Cash              -> PENDING
+         * Offer              -> PENDING
+         * Virtual            -> N/A
          */
 
-        booking.setPaymentStatus("CONFIRMED");
+        if (
+            booking.getPaymentStatus() == null ||
+            booking.getPaymentStatus()
+                .trim()
+                .isEmpty()
+        ) {
+
+            // ======================================
+            // SERVICE BOOKING
+            // ======================================
+
+            if ("SERVICE".equals(booking.getBookingType())) {
+
+                if (
+                    "GOOGLE_PAY".equals(
+                        booking.getPaymentMethod()
+                    )
+                    ||
+                    "UPI".equals(
+                        booking.getPaymentMethod()
+                    )
+                ) {
+
+                    booking.setPaymentStatus("PAID");
+
+                } else {
+
+                    booking.setPaymentStatus("PENDING");
+                }
+            }
+
+
+            // ======================================
+            // OFFER BOOKING
+            // ======================================
+
+            else if (
+                "OFFER".equals(
+                    booking.getBookingType()
+                )
+            ) {
+
+                booking.setPaymentStatus("PENDING");
+            }
+
+
+            // ======================================
+            // VIRTUAL BOOKING
+            // ======================================
+
+            else if (
+                "VIRTUAL".equals(
+                    booking.getBookingType()
+                )
+            ) {
+
+                booking.setPaymentStatus("N/A");
+            }
+
+
+            // ======================================
+            // DEFAULT
+            // ======================================
+
+            else {
+
+                booking.setPaymentStatus("PENDING");
+            }
+
+        } else {
+
+            /*
+             * If frontend already sent a status
+             * such as PAID, keep it.
+             */
+
+            booking.setPaymentStatus(
+                booking.getPaymentStatus()
+                    .trim()
+                    .toUpperCase()
+            );
+        }
 
 
         // ==========================================
-        // SERVICE PRICE
+        // PAYMENT AMOUNT
         // ==========================================
 
-        double servicePrice =
-            getServicePrice(
-                booking.getService()
+        if (
+            "SERVICE".equals(
+                booking.getBookingType()
+            )
+        ) {
+
+            double servicePrice =
+                getServicePrice(
+                    booking.getService()
+                );
+
+            booking.setPaymentAmount(
+                servicePrice
             );
 
-        booking.setPaymentAmount(servicePrice);
+        } else {
+
+            /*
+             * OFFER and VIRTUAL bookings
+             * do not use service payment amount.
+             */
+
+            booking.setPaymentAmount(0.0);
+        }
 
 
         // ==========================================
@@ -399,6 +520,10 @@ public class BookingController {
                 .orElse(null);
 
 
+        // ==========================================
+        // BOOKING NOT FOUND
+        // ==========================================
+
         if (existingBooking == null) {
             return null;
         }
@@ -447,38 +572,150 @@ public class BookingController {
 
 
         // ==========================================
+        // PAYMENT STATUS
+        // ==========================================
+
+        if (
+            updatedBooking.getPaymentStatus() != null &&
+            !updatedBooking
+                .getPaymentStatus()
+                .trim()
+                .isEmpty()
+        ) {
+
+            /*
+             * Admin explicitly selected
+             * PAID / PENDING / N/A.
+             */
+
+            existingBooking.setPaymentStatus(
+                updatedBooking
+                    .getPaymentStatus()
+                    .trim()
+                    .toUpperCase()
+            );
+
+        } else {
+
+            /*
+             * If no status was sent,
+             * automatically calculate it.
+             */
+
+            if (
+                "GOOGLE_PAY".equals(
+                    existingBooking.getPaymentMethod()
+                )
+                ||
+                "UPI".equals(
+                    existingBooking.getPaymentMethod()
+                )
+            ) {
+
+                existingBooking.setPaymentStatus(
+                    "PAID"
+                );
+
+            } else if (
+                "VIRTUAL".equals(
+                    existingBooking.getBookingType()
+                )
+            ) {
+
+                existingBooking.setPaymentStatus(
+                    "N/A"
+                );
+
+            } else {
+
+                existingBooking.setPaymentStatus(
+                    "PENDING"
+                );
+            }
+        }
+
+
+        // ==========================================
         // PAYMENT AMOUNT
         // ==========================================
 
-        double servicePrice =
-            getServicePrice(
-                updatedBooking.getService()
+        if (
+            "SERVICE".equals(
+                existingBooking.getBookingType()
+            )
+        ) {
+
+            double servicePrice =
+                getServicePrice(
+                    existingBooking.getService()
+                );
+
+            existingBooking.setPaymentAmount(
+                servicePrice
             );
 
-        existingBooking.setPaymentAmount(
-            servicePrice
-        );
+        } else {
+
+            existingBooking.setPaymentAmount(
+                0.0
+            );
+        }
 
 
         // ==========================================
-        // VIRTUAL DETAILS
+        // DESIGN
         // ==========================================
 
-        existingBooking.setDesign(
-            updatedBooking.getDesign()
-        );
+        if (
+            updatedBooking.getDesign() != null
+        ) {
 
-        existingBooking.setShape(
-            updatedBooking.getShape()
-        );
+            existingBooking.setDesign(
+                updatedBooking.getDesign()
+            );
+        }
 
-        existingBooking.setShade(
-            updatedBooking.getShade()
-        );
 
-        existingBooking.setNotes(
-            updatedBooking.getNotes()
-        );
+        // ==========================================
+        // SHAPE
+        // ==========================================
+
+        if (
+            updatedBooking.getShape() != null
+        ) {
+
+            existingBooking.setShape(
+                updatedBooking.getShape()
+            );
+        }
+
+
+        // ==========================================
+        // SHADE
+        // ==========================================
+
+        if (
+            updatedBooking.getShade() != null
+        ) {
+
+            existingBooking.setShade(
+                updatedBooking.getShade()
+            );
+        }
+
+
+        // ==========================================
+        // NOTES
+        // ==========================================
+
+        if (
+            updatedBooking.getNotes() != null
+        ) {
+
+            existingBooking.setNotes(
+                updatedBooking.getNotes()
+            );
+        }
 
 
         // ==========================================
@@ -486,7 +723,11 @@ public class BookingController {
         // ==========================================
 
         if (
-            updatedBooking.getBookingDate() != null
+            updatedBooking.getBookingDate() != null &&
+            !updatedBooking
+                .getBookingDate()
+                .trim()
+                .isEmpty()
         ) {
 
             existingBooking.setBookingDate(
@@ -500,7 +741,11 @@ public class BookingController {
         // ==========================================
 
         if (
-            updatedBooking.getBookingTime() != null
+            updatedBooking.getBookingTime() != null &&
+            !updatedBooking
+                .getBookingTime()
+                .trim()
+                .isEmpty()
         ) {
 
             existingBooking.setBookingTime(
@@ -531,7 +776,91 @@ public class BookingController {
 
 
         // ==========================================
-        // SAVE
+        // RE-CHECK PAYMENT STATUS AFTER
+        // BOOKING TYPE UPDATE
+        // ==========================================
+
+        if (
+            "VIRTUAL".equals(
+                existingBooking.getBookingType()
+            )
+        ) {
+
+            existingBooking.setPaymentStatus(
+                "N/A"
+            );
+
+            existingBooking.setPaymentAmount(
+                0.0
+            );
+
+        } else if (
+            "OFFER".equals(
+                existingBooking.getBookingType()
+            )
+        ) {
+
+            existingBooking.setPaymentStatus(
+                "PENDING"
+            );
+
+            existingBooking.setPaymentAmount(
+                0.0
+            );
+
+        } else if (
+            "SERVICE".equals(
+                existingBooking.getBookingType()
+            )
+        ) {
+
+            /*
+             * Do not change an explicitly selected
+             * PAID/PENDING status here.
+             *
+             * Only calculate automatically if needed.
+             */
+
+            if (
+                "GOOGLE_PAY".equals(
+                    existingBooking.getPaymentMethod()
+                )
+                ||
+                "UPI".equals(
+                    existingBooking.getPaymentMethod()
+                )
+            ) {
+
+                /*
+                 * Google Pay / UPI is considered PAID.
+                 */
+
+                existingBooking.setPaymentStatus(
+                    "PAID"
+                );
+
+            } else if (
+                existingBooking.getPaymentStatus() == null ||
+                existingBooking.getPaymentStatus()
+                    .trim()
+                    .isEmpty()
+            ) {
+
+                existingBooking.setPaymentStatus(
+                    "PENDING"
+                );
+            }
+
+            existingBooking.setPaymentAmount(
+                getServicePrice(
+                    existingBooking.getService()
+                )
+            );
+        }
+
+
+        // ==========================================
+        // SAVE UPDATED BOOKING
         // ==========================================
 
         Booking savedBooking =
@@ -539,6 +868,10 @@ public class BookingController {
                 existingBooking
             );
 
+
+        // ==========================================
+        // UPDATE LOG
+        // ==========================================
 
         System.out.println("=================================");
         System.out.println("💅 BOOKING UPDATED");
@@ -561,6 +894,11 @@ public class BookingController {
         System.out.println(
             "Payment Method: " +
             savedBooking.getPaymentMethod()
+        );
+
+        System.out.println(
+            "Payment Status: " +
+            savedBooking.getPaymentStatus()
         );
 
         System.out.println("=================================");
