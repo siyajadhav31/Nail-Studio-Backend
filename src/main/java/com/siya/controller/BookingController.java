@@ -23,19 +23,16 @@ public class BookingController {
 
     private final BookingRepository bookingRepository;
 
+    public BookingController(
+            BookingRepository bookingRepository) {
 
-    // ==========================================
-    // CONSTRUCTOR
-    // ==========================================
-
-    public BookingController(BookingRepository bookingRepository) {
         this.bookingRepository = bookingRepository;
     }
 
 
-    // ==========================================
-    // SERVICE PRICE METHOD
-    // ==========================================
+    // =========================================================
+    // SERVICE PRICE
+    // =========================================================
 
     private double getServicePrice(String service) {
 
@@ -43,11 +40,13 @@ public class BookingController {
             return 0.0;
         }
 
-        switch (service.trim()) {
+        String serviceName = service.trim();
 
-            // ==================================
-            // NORMAL RANGE
-            // ==================================
+        switch (serviceName) {
+
+            // =================================================
+            // NORMAL
+            // =================================================
 
             case "Basic Gel Polish":
                 return 500.0;
@@ -68,9 +67,9 @@ public class BookingController {
                 return 700.0;
 
 
-            // ==================================
-            // PREMIUM RANGE
-            // ==================================
+            // =================================================
+            // PREMIUM
+            // =================================================
 
             case "Soft Gel Extensions":
                 return 2000.0;
@@ -103,9 +102,9 @@ public class BookingController {
                 return 2500.0;
 
 
-            // ==================================
-            // LUXURY RANGE
-            // ==================================
+            // =================================================
+            // LUXURY
+            // =================================================
 
             case "Polygel Sculpted Extensions":
                 return 3500.0;
@@ -135,9 +134,9 @@ public class BookingController {
                 return 4800.0;
 
 
-            // ==================================
+            // =================================================
             // SERVICES PAGE
-            // ==================================
+            // =================================================
 
             case "Acrylic Extensions + Gel Polish":
                 return 1800.0;
@@ -164,45 +163,38 @@ public class BookingController {
                 return 1099.0;
 
 
-            // ==================================
-            // UNKNOWN SERVICE
-            // ==================================
+            // =================================================
+            // UNKNOWN
+            // =================================================
 
             default:
+                System.out.println(
+                    "⚠️ PRICE NOT FOUND FOR SERVICE: " +
+                    serviceName
+                );
+
                 return 0.0;
         }
     }
 
 
-    // ==========================================
+    // =========================================================
     // CREATE BOOKING
-    // ==========================================
+    // =========================================================
 
     @PostMapping
     public Booking createBooking(
             @RequestBody Booking booking) {
 
         System.out.println("=================================");
-        System.out.println("💅 NEW BOOKING RECEIVED");
-
-
-        // ==========================================
-        // BASIC DETAILS
-        // ==========================================
-
-        System.out.println("Name: " + booking.getName());
-        System.out.println("Email: " + booking.getEmail());
-        System.out.println("Phone: " + booking.getPhone());
-        System.out.println("Service: " + booking.getService());
+        System.out.println("💅 NEW BOOKING");
 
         System.out.println(
-            "Booking Date: " +
-            booking.getBookingDate()
+            "Name: " + booking.getName()
         );
 
         System.out.println(
-            "Booking Time: " +
-            booking.getBookingTime()
+            "Service: " + booking.getService()
         );
 
         System.out.println(
@@ -211,58 +203,22 @@ public class BookingController {
         );
 
         System.out.println(
-            "Design: " +
-            booking.getDesign()
-        );
-
-        System.out.println(
-            "Shape: " +
-            booking.getShape()
-        );
-
-        System.out.println(
-            "Shade: " +
-            booking.getShade()
-        );
-
-        System.out.println(
-            "Notes: " +
-            booking.getNotes()
-        );
-
-        System.out.println(
             "Payment Method: " +
             booking.getPaymentMethod()
         );
 
-        System.out.println(
-            "Payment Status From Frontend: " +
-            booking.getPaymentStatus()
-        );
 
-        System.out.println(
-            "Payment Amount From Frontend: " +
-            booking.getPaymentAmount()
-        );
-
-
-        // ==========================================
+        // =====================================================
         // BOOKING TYPE
-        // ==========================================
+        // =====================================================
 
-        if (
-            booking.getBookingType() == null ||
-            booking.getBookingType()
-                .trim()
-                .isEmpty()
-        ) {
+        if (booking.getBookingType() == null ||
+            booking.getBookingType().trim().isEmpty()) {
 
-            if (
-                booking.getNotes() != null &&
+            if (booking.getNotes() != null &&
                 booking.getNotes()
                     .toLowerCase()
-                    .contains("virtual preview")
-            ) {
+                    .contains("virtual preview")) {
 
                 booking.setBookingType("VIRTUAL");
 
@@ -281,16 +237,12 @@ public class BookingController {
         }
 
 
-        // ==========================================
+        // =====================================================
         // PAYMENT METHOD
-        // ==========================================
+        // =====================================================
 
-        if (
-            booking.getPaymentMethod() == null ||
-            booking.getPaymentMethod()
-                .trim()
-                .isEmpty()
-        ) {
+        if (booking.getPaymentMethod() == null ||
+            booking.getPaymentMethod().trim().isEmpty()) {
 
             booking.setPaymentMethod("CASH");
 
@@ -304,114 +256,27 @@ public class BookingController {
         }
 
 
-        // ==========================================
+        // =====================================================
         // PAYMENT STATUS
-        // ==========================================
+        // =====================================================
 
-        /*
-         * IMPORTANT:
-         *
-         * Do NOT overwrite PAID coming from frontend.
-         *
-         * Google Pay / UPI  -> PAID
-         * Cash              -> PENDING
-         * Offer              -> PENDING
-         * Virtual            -> N/A
-         */
+        if ("VIRTUAL".equals(
+                booking.getBookingType())) {
 
-        if (
-            booking.getPaymentStatus() == null ||
-            booking.getPaymentStatus()
-                .trim()
-                .isEmpty()
-        ) {
-
-            // ======================================
-            // SERVICE BOOKING
-            // ======================================
-
-            if ("SERVICE".equals(booking.getBookingType())) {
-
-                if (
-                    "GOOGLE_PAY".equals(
-                        booking.getPaymentMethod()
-                    )
-                    ||
-                    "UPI".equals(
-                        booking.getPaymentMethod()
-                    )
-                ) {
-
-                    booking.setPaymentStatus("PAID");
-
-                } else {
-
-                    booking.setPaymentStatus("PENDING");
-                }
-            }
-
-
-            // ======================================
-            // OFFER BOOKING
-            // ======================================
-
-            else if (
-                "OFFER".equals(
-                    booking.getBookingType()
-                )
-            ) {
-
-                booking.setPaymentStatus("PENDING");
-            }
-
-
-            // ======================================
-            // VIRTUAL BOOKING
-            // ======================================
-
-            else if (
-                "VIRTUAL".equals(
-                    booking.getBookingType()
-                )
-            ) {
-
-                booking.setPaymentStatus("N/A");
-            }
-
-
-            // ======================================
-            // DEFAULT
-            // ======================================
-
-            else {
-
-                booking.setPaymentStatus("PENDING");
-            }
+            booking.setPaymentStatus("N/A");
 
         } else {
 
-            /*
-             * If frontend already sent a status
-             * such as PAID, keep it.
-             */
-
-            booking.setPaymentStatus(
-                booking.getPaymentStatus()
-                    .trim()
-                    .toUpperCase()
-            );
+            booking.setPaymentStatus("PENDING");
         }
 
 
-        // ==========================================
+        // =====================================================
         // PAYMENT AMOUNT
-        // ==========================================
+        // =====================================================
 
-        if (
-            "SERVICE".equals(
-                booking.getBookingType()
-            )
-        ) {
+        if ("SERVICE".equals(
+                booking.getBookingType())) {
 
             double servicePrice =
                 getServicePrice(
@@ -424,32 +289,37 @@ public class BookingController {
 
         } else {
 
-            /*
-             * OFFER and VIRTUAL bookings
-             * do not use service payment amount.
-             */
-
             booking.setPaymentAmount(0.0);
         }
 
 
-        // ==========================================
-        // SAVE BOOKING
-        // ==========================================
+        // =====================================================
+        // PAYMENT ID
+        // =====================================================
+
+        // Payment ID payment complete hone ke baad
+        // PaymentController generate karega.
+
+        if (booking.getPaymentId() != null &&
+            booking.getPaymentId().trim().isEmpty()) {
+
+            booking.setPaymentId(null);
+        }
+
+
+        // =====================================================
+        // SAVE
+        // =====================================================
 
         Booking savedBooking =
-            bookingRepository.save(booking);
+                bookingRepository.save(booking);
 
-
-        // ==========================================
-        // SUCCESS LOG
-        // ==========================================
 
         System.out.println("=================================");
         System.out.println("✅ BOOKING SAVED");
 
         System.out.println(
-            "ID: " +
+            "Booking ID: " +
             savedBooking.getId()
         );
 
@@ -464,25 +334,24 @@ public class BookingController {
         );
 
         System.out.println(
-            "Payment Method: " +
-            savedBooking.getPaymentMethod()
-        );
-
-        System.out.println(
             "Payment Status: " +
             savedBooking.getPaymentStatus()
         );
 
-        System.out.println("=================================");
+        System.out.println(
+            "Payment ID: " +
+            savedBooking.getPaymentId()
+        );
 
+        System.out.println("=================================");
 
         return savedBooking;
     }
 
 
-    // ==========================================
+    // =========================================================
     // GET ALL BOOKINGS
-    // ==========================================
+    // =========================================================
 
     @GetMapping
     public List<Booking> getAllBookings() {
@@ -491,23 +360,23 @@ public class BookingController {
     }
 
 
-    // ==========================================
+    // =========================================================
     // GET BOOKING BY ID
-    // ==========================================
+    // =========================================================
 
     @GetMapping("/{id}")
     public Booking getBookingById(
             @PathVariable Long id) {
 
         return bookingRepository
-            .findById(id)
-            .orElse(null);
+                .findById(id)
+                .orElse(null);
     }
 
 
-    // ==========================================
+    // =========================================================
     // UPDATE BOOKING
-    // ==========================================
+    // =========================================================
 
     @PutMapping("/{id}")
     public Booking updateBooking(
@@ -515,52 +384,53 @@ public class BookingController {
             @RequestBody Booking updatedBooking) {
 
         Booking existingBooking =
-            bookingRepository
-                .findById(id)
-                .orElse(null);
-
-
-        // ==========================================
-        // BOOKING NOT FOUND
-        // ==========================================
+                bookingRepository
+                    .findById(id)
+                    .orElse(null);
 
         if (existingBooking == null) {
             return null;
         }
 
 
-        // ==========================================
+        // =====================================================
         // BASIC DETAILS
-        // ==========================================
+        // =====================================================
 
-        existingBooking.setName(
-            updatedBooking.getName()
-        );
+        if (updatedBooking.getName() != null) {
+            existingBooking.setName(
+                updatedBooking.getName()
+            );
+        }
 
-        existingBooking.setEmail(
-            updatedBooking.getEmail()
-        );
+        if (updatedBooking.getEmail() != null) {
+            existingBooking.setEmail(
+                updatedBooking.getEmail()
+            );
+        }
 
-        existingBooking.setPhone(
-            updatedBooking.getPhone()
-        );
+        if (updatedBooking.getPhone() != null) {
+            existingBooking.setPhone(
+                updatedBooking.getPhone()
+            );
+        }
 
-        existingBooking.setService(
-            updatedBooking.getService()
-        );
+        if (updatedBooking.getService() != null) {
+            existingBooking.setService(
+                updatedBooking.getService()
+            );
+        }
 
 
-        // ==========================================
+        // =====================================================
         // PAYMENT METHOD
-        // ==========================================
+        // =====================================================
 
-        if (
-            updatedBooking.getPaymentMethod() != null &&
+        if (updatedBooking.getPaymentMethod() != null &&
             !updatedBooking
                 .getPaymentMethod()
                 .trim()
-                .isEmpty()
-        ) {
+                .isEmpty()) {
 
             existingBooking.setPaymentMethod(
                 updatedBooking
@@ -571,22 +441,15 @@ public class BookingController {
         }
 
 
-        // ==========================================
+        // =====================================================
         // PAYMENT STATUS
-        // ==========================================
+        // =====================================================
 
-        if (
-            updatedBooking.getPaymentStatus() != null &&
+        if (updatedBooking.getPaymentStatus() != null &&
             !updatedBooking
                 .getPaymentStatus()
                 .trim()
-                .isEmpty()
-        ) {
-
-            /*
-             * Admin explicitly selected
-             * PAID / PENDING / N/A.
-             */
+                .isEmpty()) {
 
             existingBooking.setPaymentStatus(
                 updatedBooking
@@ -594,141 +457,80 @@ public class BookingController {
                     .trim()
                     .toUpperCase()
             );
-
-        } else {
-
-            /*
-             * If no status was sent,
-             * automatically calculate it.
-             */
-
-            if (
-                "GOOGLE_PAY".equals(
-                    existingBooking.getPaymentMethod()
-                )
-                ||
-                "UPI".equals(
-                    existingBooking.getPaymentMethod()
-                )
-            ) {
-
-                existingBooking.setPaymentStatus(
-                    "PAID"
-                );
-
-            } else if (
-                "VIRTUAL".equals(
-                    existingBooking.getBookingType()
-                )
-            ) {
-
-                existingBooking.setPaymentStatus(
-                    "N/A"
-                );
-
-            } else {
-
-                existingBooking.setPaymentStatus(
-                    "PENDING"
-                );
-            }
         }
 
 
-        // ==========================================
-        // PAYMENT AMOUNT
-        // ==========================================
+        // =====================================================
+        // IMPORTANT: PAYMENT ID
+        // =====================================================
 
-        if (
-            "SERVICE".equals(
-                existingBooking.getBookingType()
-            )
-        ) {
+        if (updatedBooking.getPaymentId() != null &&
+            !updatedBooking
+                .getPaymentId()
+                .trim()
+                .isEmpty()) {
 
-            double servicePrice =
-                getServicePrice(
-                    existingBooking.getService()
-                );
-
-            existingBooking.setPaymentAmount(
-                servicePrice
-            );
-
-        } else {
-
-            existingBooking.setPaymentAmount(
-                0.0
+            existingBooking.setPaymentId(
+                updatedBooking
+                    .getPaymentId()
+                    .trim()
             );
         }
 
 
-        // ==========================================
+        // =====================================================
         // DESIGN
-        // ==========================================
+        // =====================================================
 
-        if (
-            updatedBooking.getDesign() != null
-        ) {
-
+        if (updatedBooking.getDesign() != null) {
             existingBooking.setDesign(
                 updatedBooking.getDesign()
             );
         }
 
 
-        // ==========================================
+        // =====================================================
         // SHAPE
-        // ==========================================
+        // =====================================================
 
-        if (
-            updatedBooking.getShape() != null
-        ) {
-
+        if (updatedBooking.getShape() != null) {
             existingBooking.setShape(
                 updatedBooking.getShape()
             );
         }
 
 
-        // ==========================================
+        // =====================================================
         // SHADE
-        // ==========================================
+        // =====================================================
 
-        if (
-            updatedBooking.getShade() != null
-        ) {
-
+        if (updatedBooking.getShade() != null) {
             existingBooking.setShade(
                 updatedBooking.getShade()
             );
         }
 
 
-        // ==========================================
+        // =====================================================
         // NOTES
-        // ==========================================
+        // =====================================================
 
-        if (
-            updatedBooking.getNotes() != null
-        ) {
-
+        if (updatedBooking.getNotes() != null) {
             existingBooking.setNotes(
                 updatedBooking.getNotes()
             );
         }
 
 
-        // ==========================================
+        // =====================================================
         // DATE
-        // ==========================================
+        // =====================================================
 
-        if (
-            updatedBooking.getBookingDate() != null &&
+        if (updatedBooking.getBookingDate() != null &&
             !updatedBooking
                 .getBookingDate()
                 .trim()
-                .isEmpty()
-        ) {
+                .isEmpty()) {
 
             existingBooking.setBookingDate(
                 updatedBooking.getBookingDate()
@@ -736,17 +538,15 @@ public class BookingController {
         }
 
 
-        // ==========================================
+        // =====================================================
         // TIME
-        // ==========================================
+        // =====================================================
 
-        if (
-            updatedBooking.getBookingTime() != null &&
+        if (updatedBooking.getBookingTime() != null &&
             !updatedBooking
                 .getBookingTime()
                 .trim()
-                .isEmpty()
-        ) {
+                .isEmpty()) {
 
             existingBooking.setBookingTime(
                 updatedBooking.getBookingTime()
@@ -754,17 +554,15 @@ public class BookingController {
         }
 
 
-        // ==========================================
+        // =====================================================
         // BOOKING TYPE
-        // ==========================================
+        // =====================================================
 
-        if (
-            updatedBooking.getBookingType() != null &&
+        if (updatedBooking.getBookingType() != null &&
             !updatedBooking
                 .getBookingType()
                 .trim()
-                .isEmpty()
-        ) {
+                .isEmpty()) {
 
             existingBooking.setBookingType(
                 updatedBooking
@@ -775,103 +573,95 @@ public class BookingController {
         }
 
 
-        // ==========================================
-        // RE-CHECK PAYMENT STATUS AFTER
-        // BOOKING TYPE UPDATE
-        // ==========================================
+        // =====================================================
+        // PAYMENT AMOUNT
+        // =====================================================
 
-        if (
-            "VIRTUAL".equals(
-                existingBooking.getBookingType()
-            )
-        ) {
-
-            existingBooking.setPaymentStatus(
-                "N/A"
-            );
-
-            existingBooking.setPaymentAmount(
-                0.0
-            );
-
-        } else if (
-            "OFFER".equals(
-                existingBooking.getBookingType()
-            )
-        ) {
-
-            existingBooking.setPaymentStatus(
-                "PENDING"
-            );
-
-            existingBooking.setPaymentAmount(
-                0.0
-            );
-
-        } else if (
-            "SERVICE".equals(
-                existingBooking.getBookingType()
-            )
-        ) {
-
-            /*
-             * Do not change an explicitly selected
-             * PAID/PENDING status here.
-             *
-             * Only calculate automatically if needed.
-             */
-
-            if (
-                "GOOGLE_PAY".equals(
-                    existingBooking.getPaymentMethod()
-                )
-                ||
-                "UPI".equals(
-                    existingBooking.getPaymentMethod()
-                )
-            ) {
-
-                /*
-                 * Google Pay / UPI is considered PAID.
-                 */
-
-                existingBooking.setPaymentStatus(
-                    "PAID"
-                );
-
-            } else if (
-                existingBooking.getPaymentStatus() == null ||
-                existingBooking.getPaymentStatus()
-                    .trim()
-                    .isEmpty()
-            ) {
-
-                existingBooking.setPaymentStatus(
-                    "PENDING"
-                );
-            }
+        if ("SERVICE".equals(
+                existingBooking.getBookingType())) {
 
             existingBooking.setPaymentAmount(
                 getServicePrice(
                     existingBooking.getService()
                 )
             );
+
+        } else {
+
+            existingBooking.setPaymentAmount(0.0);
         }
 
 
-        // ==========================================
-        // SAVE UPDATED BOOKING
-        // ==========================================
+        // =====================================================
+        // VIRTUAL
+        // =====================================================
 
-        Booking savedBooking =
-            bookingRepository.save(
+        if ("VIRTUAL".equals(
+                existingBooking.getBookingType())) {
+
+            existingBooking.setPaymentStatus("N/A");
+            existingBooking.setPaymentAmount(0.0);
+            existingBooking.setPaymentId(null);
+        }
+
+
+        // =====================================================
+        // OFFER
+        // =====================================================
+
+        else if ("OFFER".equals(
+                existingBooking.getBookingType())) {
+
+            existingBooking.setPaymentAmount(0.0);
+
+            if (existingBooking.getPaymentStatus() == null ||
                 existingBooking
+                    .getPaymentStatus()
+                    .trim()
+                    .isEmpty()) {
+
+                existingBooking.setPaymentStatus(
+                    "PENDING"
+                );
+            }
+        }
+
+
+        // =====================================================
+        // SERVICE
+        // =====================================================
+
+        else if ("SERVICE".equals(
+                existingBooking.getBookingType())) {
+
+            existingBooking.setPaymentAmount(
+                getServicePrice(
+                    existingBooking.getService()
+                )
             );
 
+            if (existingBooking.getPaymentStatus() == null ||
+                existingBooking
+                    .getPaymentStatus()
+                    .trim()
+                    .isEmpty()) {
 
-        // ==========================================
-        // UPDATE LOG
-        // ==========================================
+                existingBooking.setPaymentStatus(
+                    "PENDING"
+                );
+            }
+        }
+
+
+        // =====================================================
+        // SAVE
+        // =====================================================
+
+        Booking savedBooking =
+                bookingRepository.save(
+                    existingBooking
+                );
+
 
         System.out.println("=================================");
         System.out.println("💅 BOOKING UPDATED");
@@ -901,68 +691,31 @@ public class BookingController {
             savedBooking.getPaymentStatus()
         );
 
-        System.out.println("=================================");
+        System.out.println(
+            "Payment ID: " +
+            savedBooking.getPaymentId()
+        );
 
+        System.out.println("=================================");
 
         return savedBooking;
     }
 
 
-    // ==========================================
+    // =========================================================
     // DELETE BOOKING
-    // ==========================================
+    // =========================================================
 
     @DeleteMapping("/{id}")
     public String deleteBooking(
             @PathVariable Long id) {
 
-        System.out.println("=================================");
-        System.out.println("🗑 DELETE BOOKING REQUEST");
-
-        System.out.println(
-            "Booking ID: " + id
-        );
-
-
-        // ==========================================
-        // CHECK BOOKING
-        // ==========================================
-
-        if (
-            !bookingRepository.existsById(id)
-        ) {
-
-            System.out.println(
-                "❌ BOOKING NOT FOUND"
-            );
-
-            System.out.println(
-                "================================="
-            );
+        if (!bookingRepository.existsById(id)) {
 
             return "Booking not found";
         }
 
-
-        // ==========================================
-        // DELETE
-        // ==========================================
-
         bookingRepository.deleteById(id);
-
-
-        System.out.println(
-            "✅ BOOKING DELETED"
-        );
-
-        System.out.println(
-            "Deleted ID: " + id
-        );
-
-        System.out.println(
-            "================================="
-        );
-
 
         return "Booking deleted successfully";
     }

@@ -51,23 +51,16 @@ public class Booking {
     private String paymentStatus;
 
     // ==========================================
-    // RAZORPAY PAYMENT ID
+    // PAYMENT ID
     // ==========================================
 
     private String paymentId;
-
-    // ==========================================
-    // RAZORPAY ORDER ID
-    // ==========================================
-
-    private String razorpayOrderId;
 
     // ==========================================
     // PAYMENT AMOUNT
     // ==========================================
 
     private Double paymentAmount;
-
 
     // ==========================================
     // DEFAULT CONSTRUCTOR
@@ -76,7 +69,6 @@ public class Booking {
     public Booking() {
 
     }
-
 
     // ==========================================
     // GET ID
@@ -87,7 +79,6 @@ public class Booking {
         return id;
 
     }
-
 
     // ==========================================
     // NAME
@@ -105,7 +96,6 @@ public class Booking {
 
     }
 
-
     // ==========================================
     // EMAIL
     // ==========================================
@@ -121,7 +111,6 @@ public class Booking {
         this.email = email;
 
     }
-
 
     // ==========================================
     // PHONE
@@ -139,7 +128,6 @@ public class Booking {
 
     }
 
-
     // ==========================================
     // SERVICE
     // ==========================================
@@ -155,7 +143,6 @@ public class Booking {
         this.service = service;
 
     }
-
 
     // ==========================================
     // DESIGN
@@ -173,7 +160,6 @@ public class Booking {
 
     }
 
-
     // ==========================================
     // SHAPE
     // ==========================================
@@ -189,7 +175,6 @@ public class Booking {
         this.shape = shape;
 
     }
-
 
     // ==========================================
     // SHADE
@@ -207,7 +192,6 @@ public class Booking {
 
     }
 
-
     // ==========================================
     // BOOKING DATE
     // ==========================================
@@ -223,7 +207,6 @@ public class Booking {
         this.bookingDate = bookingDate;
 
     }
-
 
     // ==========================================
     // BOOKING TIME
@@ -241,7 +224,6 @@ public class Booking {
 
     }
 
-
     // ==========================================
     // BOOKING TYPE
     // ==========================================
@@ -257,7 +239,6 @@ public class Booking {
         this.bookingType = bookingType;
 
     }
-
 
     // ==========================================
     // NOTES
@@ -275,7 +256,6 @@ public class Booking {
 
     }
 
-
     // ==========================================
     // PAYMENT METHOD
     // ==========================================
@@ -291,7 +271,6 @@ public class Booking {
         this.paymentMethod = paymentMethod;
 
     }
-
 
     // ==========================================
     // PAYMENT STATUS
@@ -309,7 +288,6 @@ public class Booking {
 
     }
 
-
     // ==========================================
     // PAYMENT ID
     // ==========================================
@@ -325,24 +303,6 @@ public class Booking {
         this.paymentId = paymentId;
 
     }
-
-
-    // ==========================================
-    // RAZORPAY ORDER ID
-    // ==========================================
-
-    public String getRazorpayOrderId() {
-
-        return razorpayOrderId;
-
-    }
-
-    public void setRazorpayOrderId(String razorpayOrderId) {
-
-        this.razorpayOrderId = razorpayOrderId;
-
-    }
-
 
     // ==========================================
     // PAYMENT AMOUNT
