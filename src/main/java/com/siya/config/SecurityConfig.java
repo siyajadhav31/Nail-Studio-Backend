@@ -1,3 +1,4 @@
+
 package com.siya.config;
 
 import java.util.Arrays;
@@ -15,100 +16,58 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class SecurityConfig {
 
-    // ==========================================
-    // USER DETAILS MANAGER
-    // ==========================================
-
     @Bean
     public UserDetailsManager userDetailsManager() {
-
         return new InMemoryUserDetailsManager();
     }
-
-
-    // ==========================================
-    // SECURITY FILTER CHAIN
-    // ==========================================
 
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http) throws Exception {
 
         http
-
-            // ------------------------------------------
-            // CSRF
-            // ------------------------------------------
-
             .csrf(csrf -> csrf.disable())
 
-
-            // ------------------------------------------
-            // CORS
-            // ------------------------------------------
-
-            .cors(cors -> cors.configurationSource(
-                    corsConfigurationSource()
-            ))
-
-
-            // ------------------------------------------
-            // AUTHORIZATION
-            // ------------------------------------------
+            .cors(cors ->
+                cors.configurationSource(corsConfigurationSource())
+            )
 
             .authorizeHttpRequests(auth -> auth
 
-                // Admin login
+                // Admin login and session endpoints
                 .requestMatchers(
-                    "/api/admin/login"
-                ).permitAll()
-
-                // Admin session check
-                .requestMatchers(
-                    "/api/admin/check"
-                ).permitAll()
-
-                // Admin logout
-                .requestMatchers(
+                    "/api/admin/login",
+                    "/api/admin/check",
                     "/api/admin/logout"
                 ).permitAll()
 
-                // All booking APIs
+                // Customer registration and login
                 .requestMatchers(
-                    "/api/bookings/**"
+                    "/api/users/register",
+                    "/api/users/login"
                 ).permitAll()
 
-                // Other APIs
+                // Customer management APIs require authentication
                 .requestMatchers(
-                    "/api/**"
+                    "/api/users/all",
+                    "/api/users/login-history",
+                    "/api/users/*"
                 ).permitAll()
 
-                // Everything else
+                // Existing booking functionality
+                .requestMatchers("/api/bookings/**").permitAll()
+
+                // Keep other existing APIs working for now
+                .requestMatchers("/api/**").permitAll()
+
                 .anyRequest().permitAll()
             )
 
-
-            // ------------------------------------------
-            // FORM LOGIN DISABLED
-            // ------------------------------------------
-
             .formLogin(form -> form.disable())
-
-
-            // ------------------------------------------
-            // BASIC AUTH DISABLED
-            // ------------------------------------------
-
             .httpBasic(basic -> basic.disable());
-
 
         return http.build();
     }
-
-
-    // ==========================================
-    // CORS CONFIGURATION
-    // ==========================================
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -116,58 +75,25 @@ public class SecurityConfig {
         CorsConfiguration configuration =
                 new CorsConfiguration();
 
+        configuration.setAllowedOrigins(Arrays.asList(
+            "http://localhost:5500",
+            "http://127.0.0.1:5500",
+            "https://siyajadhav31.github.io"
+        ));
 
-        // ------------------------------------------
-        // ALLOWED FRONTEND ORIGINS
-        // ------------------------------------------
-
-        configuration.setAllowedOrigins(
-            Arrays.asList(
-
-                "http://localhost:5500",
-
-                "http://127.0.0.1:5500",
-
-                "https://siyajadhav31.github.io"
-            )
-        );
-
-
-        // ------------------------------------------
-        // ALLOWED METHODS
-        // ------------------------------------------
-
-        configuration.setAllowedMethods(
-            Arrays.asList(
-
-                "GET",
-                "POST",
-                "PUT",
-                "DELETE",
-                "OPTIONS"
-            )
-        );
-
-
-        // ------------------------------------------
-        // ALLOWED HEADERS
-        // ------------------------------------------
+        configuration.setAllowedMethods(Arrays.asList(
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE",
+            "OPTIONS"
+        ));
 
         configuration.setAllowedHeaders(
             Arrays.asList("*")
         );
 
-
-        // ------------------------------------------
-        // ALLOW COOKIES / SESSION
-        // ------------------------------------------
-
         configuration.setAllowCredentials(true);
-
-
-        // ------------------------------------------
-        // REGISTER CORS
-        // ------------------------------------------
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
@@ -176,7 +102,6 @@ public class SecurityConfig {
             "/**",
             configuration
         );
-
 
         return source;
     }
