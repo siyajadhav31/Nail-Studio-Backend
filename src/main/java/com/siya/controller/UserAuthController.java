@@ -38,16 +38,12 @@ public class UserAuthController {
     public UserAuthController(
             UserRepository userRepository,
             LoginHistoryRepository loginHistoryRepository) {
-
         this.userRepository = userRepository;
         this.loginHistoryRepository = loginHistoryRepository;
     }
 
-    // ==========================================
     // CUSTOMER REGISTRATION
     // POST /api/users/register
-    // ==========================================
-
     @PostMapping("/register")
     public ResponseEntity<?> register(
             @RequestBody Map<String, String> data) {
@@ -72,18 +68,13 @@ public class UserAuthController {
 
         if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                Map.of(
-                    "message",
-                    "This email is already registered."
-                )
+                Map.of("message", "This email is already registered.")
             );
         }
 
         User user = new User();
         user.setName(name.trim());
         user.setEmail(normalizedEmail);
-
-        // Store hashed password, not plain text
         user.setPassword(passwordEncoder.encode(password));
 
         userRepository.save(user);
@@ -93,11 +84,8 @@ public class UserAuthController {
         );
     }
 
-    // ==========================================
     // CUSTOMER LOGIN
     // POST /api/users/login
-    // ==========================================
-
     @PostMapping("/login")
     public ResponseEntity<?> login(
             @RequestBody Map<String, String> data,
@@ -110,10 +98,7 @@ public class UserAuthController {
                 || password == null || password.isBlank()) {
 
             return ResponseEntity.badRequest().body(
-                Map.of(
-                    "message",
-                    "Email and password are required."
-                )
+                Map.of("message", "Email and password are required.")
             );
         }
 
@@ -123,16 +108,11 @@ public class UserAuthController {
 
         if (user == null
                 || !passwordEncoder.matches(
-                        password, user.getPassword())) {
+                    password, user.getPassword())) {
 
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(
-                        Map.of(
-                            "message",
-                            "Incorrect email or password."
-                        )
-                    );
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                Map.of("message", "Incorrect email or password.")
+            );
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -140,15 +120,13 @@ public class UserAuthController {
         user.setLastLogin(now);
         userRepository.save(user);
 
-        // Save customer details in the session
+        // Store customer details in the server-side session
         session.setAttribute("customerId", user.getId());
         session.setAttribute("customerEmail", user.getEmail());
         session.setAttribute("customerName", user.getName());
 
-        // Save every successful login
-        loginHistoryRepository.save(
-            new LoginHistory(user, now)
-        );
+        // Save successful login history
+        loginHistoryRepository.save(new LoginHistory(user, now));
 
         return ResponseEntity.ok(
             Map.of(
@@ -159,11 +137,8 @@ public class UserAuthController {
         );
     }
 
-    // ==========================================
     // CHECK CUSTOMER SESSION
     // GET /api/users/session
-    // ==========================================
-
     @GetMapping("/session")
     public ResponseEntity<?> checkCustomerSession(
             HttpSession session) {
@@ -178,14 +153,12 @@ public class UserAuthController {
                 (String) session.getAttribute("customerName");
 
         if (customerId == null || customerEmail == null) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(
-                        Map.of(
-                            "loggedIn", false,
-                            "message", "Customer login required."
-                        )
-                    );
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                Map.of(
+                    "loggedIn", false,
+                    "message", "Customer login required."
+                )
+            );
         }
 
         return ResponseEntity.ok(
@@ -198,35 +171,22 @@ public class UserAuthController {
         );
     }
 
-    // ==========================================
     // ADMIN SESSION CHECK
-    // ==========================================
-
     private boolean isAdminLoggedIn(HttpSession session) {
-
         return Boolean.TRUE.equals(
             session.getAttribute("adminLoggedIn")
         );
     }
 
-    // ==========================================
     // GET ALL REGISTERED USERS
     // GET /api/users/all
-    // ==========================================
-
     @GetMapping("/all")
-    public ResponseEntity<?> getAllUsers(
-            HttpSession session) {
+    public ResponseEntity<?> getAllUsers(HttpSession session) {
 
         if (!isAdminLoggedIn(session)) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(
-                        Map.of(
-                            "message",
-                            "Admin login required."
-                        )
-                    );
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                Map.of("message", "Admin login required.")
+            );
         }
 
         List<Map<String, Object>> users =
@@ -261,24 +221,15 @@ public class UserAuthController {
         return ResponseEntity.ok(users);
     }
 
-    // ==========================================
     // GET CUSTOMER LOGIN HISTORY
     // GET /api/users/login-history
-    // ==========================================
-
     @GetMapping("/login-history")
-    public ResponseEntity<?> getLoginHistory(
-            HttpSession session) {
+    public ResponseEntity<?> getLoginHistory(HttpSession session) {
 
         if (!isAdminLoggedIn(session)) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(
-                        Map.of(
-                            "message",
-                            "Admin login required."
-                        )
-                    );
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                Map.of("message", "Admin login required.")
+            );
         }
 
         List<Map<String, Object>> history =
@@ -290,14 +241,8 @@ public class UserAuthController {
                                 new java.util.LinkedHashMap<>();
 
                         item.put("id", record.getId());
-                        item.put(
-                            "name",
-                            record.getUser().getName()
-                        );
-                        item.put(
-                            "email",
-                            record.getUser().getEmail()
-                        );
+                        item.put("name", record.getUser().getName());
+                        item.put("email", record.getUser().getEmail());
                         item.put(
                             "loginTime",
                             record.getLoginTime().toString()
@@ -310,38 +255,25 @@ public class UserAuthController {
         return ResponseEntity.ok(history);
     }
 
-    // ==========================================
     // DELETE REGISTERED USER
     // DELETE /api/users/{id}
-    // ==========================================
-
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(
             @PathVariable Long id,
             HttpSession session) {
 
         if (!isAdminLoggedIn(session)) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(
-                        Map.of(
-                            "message",
-                            "Admin login required."
-                        )
-                    );
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                Map.of("message", "Admin login required.")
+            );
         }
 
         User user = userRepository.findById(id).orElse(null);
 
         if (user == null) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(
-                        Map.of(
-                            "message",
-                            "User not found."
-                        )
-                    );
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                Map.of("message", "User not found.")
+            );
         }
 
         // Delete login history before deleting the user
