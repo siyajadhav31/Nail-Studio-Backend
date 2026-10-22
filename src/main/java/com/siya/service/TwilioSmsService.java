@@ -18,62 +18,104 @@ public class TwilioSmsService {
 
     public boolean sendSms(String phone, String message) {
         try {
-            String accountSid = System.getenv("TWILIO_ACCOUNT_SID");
-            String authToken = System.getenv("TWILIO_AUTH_TOKEN");
-            String fromNumber = System.getenv("TWILIO_FROM_NUMBER");
+            String accountSid =
+                    System.getenv("TWILIO_ACCOUNT_SID");
 
-            if (accountSid == null || authToken == null
-                    || fromNumber == null
-                    || accountSid.isBlank()
-                    || authToken.isBlank()
-                    || fromNumber.isBlank()) {
-                System.err.println("Twilio environment variables are missing.");
+            String authToken =
+                    System.getenv("TWILIO_AUTH_TOKEN");
+
+            String fromNumber =
+                    System.getenv("TWILIO_FROM_NUMBER");
+
+            if (accountSid == null || accountSid.isBlank()
+                    || authToken == null || authToken.isBlank()
+                    || fromNumber == null || fromNumber.isBlank()) {
+
+                System.err.println(
+                        "SMS ERROR: Twilio environment variables are missing."
+                );
                 return false;
             }
 
             String toNumber = normalizeIndianPhone(phone);
 
             if (toNumber == null) {
-                System.err.println("Invalid customer phone number.");
+                System.err.println(
+                        "SMS ERROR: Invalid customer phone number."
+                );
                 return false;
             }
 
             String formData =
                     "To=" + encode(toNumber)
-                    + "&From=" + encode(fromNumber)
+                    + "&From=" + encode(fromNumber.trim())
                     + "&Body=" + encode(message);
 
-            String credentials = accountSid + ":" + authToken;
-            String basicAuth = Base64.getEncoder().encodeToString(
-                    credentials.getBytes(StandardCharsets.UTF_8));
+            String credentials = accountSid.trim()
+                    + ":" + authToken.trim();
 
-            String url = "https://api.twilio.com/2010-04-01/Accounts/"
-                    + accountSid + "/Messages.json";
+            String basicAuth = Base64.getEncoder().encodeToString(
+                    credentials.getBytes(StandardCharsets.UTF_8)
+            );
+
+            String url =
+                    "https://api.twilio.com/2010-04-01/Accounts/"
+                    + accountSid.trim()
+                    + "/Messages.json";
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .header("Authorization", "Basic " + basicAuth)
-                    .header("Content-Type",
-                            "application/x-www-form-urlencoded")
+                    .header(
+                            "Content-Type",
+                            "application/x-www-form-urlencoded"
+                    )
                     .POST(HttpRequest.BodyPublishers.ofString(formData))
                     .build();
 
             HttpResponse<String> response = httpClient.send(
-                    request, HttpResponse.BodyHandlers.ofString());
+                    request,
+                    HttpResponse.BodyHandlers.ofString()
+            );
 
             if (response.statusCode() >= 200
                     && response.statusCode() < 300) {
-                System.out.println("SMS sent successfully.");
+
+                System.out.println(
+                        "SMS request accepted by Twilio. HTTP status: "
+                        + response.statusCode()
+                );
+
                 return true;
             }
 
-            System.err.println("Twilio SMS failed. HTTP status: "
-                    + response.statusCode());
-            System.err.println("Twilio response: " + response.body());
+            // Twilio response includes an error code and description.
+            // Do not print account credentials or the Authorization header.
+            System.err.println(
+                    "SMS ERROR: Twilio HTTP status: "
+                    + response.statusCode()
+            );
+
+            System.err.println(
+                    "Twilio error response: " + response.body()
+            );
+
+            return false;
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+
+            System.err.println(
+                    "SMS ERROR: Sending SMS was interrupted."
+            );
+
             return false;
 
         } catch (Exception e) {
-            System.err.println("Unable to send SMS: " + e.getMessage());
+            System.err.println(
+                    "SMS ERROR: " + e.getMessage()
+            );
+
             return false;
         }
     }
@@ -83,13 +125,16 @@ public class TwilioSmsService {
             return null;
         }
 
-        String number = phone.trim().replaceAll("[\\s()-]", "");
+        String number = phone.trim()
+                .replaceAll("[\\s()-]", "");
 
+        // Indian 10-digit mobile number
         if (number.matches("[6-9][0-9]{9}")) {
             return "+91" + number;
         }
 
-        if (number.matches("\\+\\d{8,15}")) {
+        // International number already in E.164 format
+        if (number.matches("\\+[1-9][0-9]{7,14}")) {
             return number;
         }
 
@@ -97,6 +142,9 @@ public class TwilioSmsService {
     }
 
     private String encode(String value) {
-        return URLEncoder.encode(value, StandardCharsets.UTF_8);
+        return URLEncoder.encode(
+                value,
+                StandardCharsets.UTF_8
+        );
     }
 }
