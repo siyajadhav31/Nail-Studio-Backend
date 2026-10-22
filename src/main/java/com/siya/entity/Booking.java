@@ -1,3 +1,4 @@
+
 package com.siya.entity;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
@@ -7,6 +8,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+import java.time.LocalDateTime;
+
 @Entity
 public class Booking {
 
@@ -15,17 +18,11 @@ public class Booking {
     private Long id;
 
     private String name;
-
     private String email;
-
     private String phone;
-
     private String service;
-
     private String design;
-
     private String shape;
-
     private String shade;
 
     @JsonAlias({"date"})
@@ -35,289 +32,187 @@ public class Booking {
     private String bookingTime;
 
     private String bookingType;
-
     private String notes;
 
-    // ==========================================
-    // PAYMENT METHOD
-    // ==========================================
-
+    // Payment details
     private String paymentMethod;
-
-    // ==========================================
-    // PAYMENT STATUS
-    // ==========================================
-
     private String paymentStatus;
-
-    // ==========================================
-    // PAYMENT ID
-    // ==========================================
-
     private String paymentId;
-
-    // ==========================================
-    // PAYMENT AMOUNT
-    // ==========================================
-
+    private String razorpayOrderId;
     private Double paymentAmount;
 
-    // ==========================================
-    // DEFAULT CONSTRUCTOR
-    // ==========================================
+    // Appointment cancellation
+    private String bookingStatus = "CONFIRMED";
+    private LocalDateTime cancelledAt;
+
+    // Refund details
+    private String refundId;
+    private String refundStatus = "NOT_REQUIRED";
 
     public Booking() {
-
     }
-
-    // ==========================================
-    // GET ID
-    // ==========================================
 
     public Long getId() {
-
         return id;
-
     }
 
-    // ==========================================
-    // NAME
-    // ==========================================
-
     public String getName() {
-
         return name;
-
     }
 
     public void setName(String name) {
-
         this.name = name;
-
     }
 
-    // ==========================================
-    // EMAIL
-    // ==========================================
-
     public String getEmail() {
-
         return email;
-
     }
 
     public void setEmail(String email) {
-
         this.email = email;
-
     }
 
-    // ==========================================
-    // PHONE
-    // ==========================================
-
     public String getPhone() {
-
         return phone;
-
     }
 
     public void setPhone(String phone) {
-
         this.phone = phone;
-
     }
 
-    // ==========================================
-    // SERVICE
-    // ==========================================
-
     public String getService() {
-
         return service;
-
     }
 
     public void setService(String service) {
-
         this.service = service;
-
     }
 
-    // ==========================================
-    // DESIGN
-    // ==========================================
-
     public String getDesign() {
-
         return design;
-
     }
 
     public void setDesign(String design) {
-
         this.design = design;
-
     }
 
-    // ==========================================
-    // SHAPE
-    // ==========================================
-
     public String getShape() {
-
         return shape;
-
     }
 
     public void setShape(String shape) {
-
         this.shape = shape;
-
     }
 
-    // ==========================================
-    // SHADE
-    // ==========================================
-
     public String getShade() {
-
         return shade;
-
     }
 
     public void setShade(String shade) {
-
         this.shade = shade;
-
     }
 
-    // ==========================================
-    // BOOKING DATE
-    // ==========================================
-
     public String getBookingDate() {
-
         return bookingDate;
-
     }
 
     public void setBookingDate(String bookingDate) {
-
         this.bookingDate = bookingDate;
-
     }
 
-    // ==========================================
-    // BOOKING TIME
-    // ==========================================
-
     public String getBookingTime() {
-
         return bookingTime;
-
     }
 
     public void setBookingTime(String bookingTime) {
-
         this.bookingTime = bookingTime;
-
     }
 
-    // ==========================================
-    // BOOKING TYPE
-    // ==========================================
-
     public String getBookingType() {
-
         return bookingType;
-
     }
 
     public void setBookingType(String bookingType) {
-
         this.bookingType = bookingType;
-
     }
 
-    // ==========================================
-    // NOTES
-    // ==========================================
-
     public String getNotes() {
-
         return notes;
-
     }
 
     public void setNotes(String notes) {
-
         this.notes = notes;
-
     }
 
-    // ==========================================
-    // PAYMENT METHOD
-    // ==========================================
-
     public String getPaymentMethod() {
-
         return paymentMethod;
-
     }
 
     public void setPaymentMethod(String paymentMethod) {
-
         this.paymentMethod = paymentMethod;
-
     }
 
-    // ==========================================
-    // PAYMENT STATUS
-    // ==========================================
-
     public String getPaymentStatus() {
-
         return paymentStatus;
-
     }
 
     public void setPaymentStatus(String paymentStatus) {
-
         this.paymentStatus = paymentStatus;
-
     }
 
-    // ==========================================
-    // PAYMENT ID
-    // ==========================================
-
     public String getPaymentId() {
-
         return paymentId;
-
     }
 
     public void setPaymentId(String paymentId) {
-
         this.paymentId = paymentId;
-
     }
 
-    // ==========================================
-    // PAYMENT AMOUNT
-    // ==========================================
+    public String getRazorpayOrderId() {
+        return razorpayOrderId;
+    }
+
+    public void setRazorpayOrderId(String razorpayOrderId) {
+        this.razorpayOrderId = razorpayOrderId;
+    }
 
     public Double getPaymentAmount() {
-
         return paymentAmount;
-
     }
 
     public void setPaymentAmount(Double paymentAmount) {
-
         this.paymentAmount = paymentAmount;
-
     }
 
+    public String getBookingStatus() {
+        return bookingStatus;
+    }
+
+    public void setBookingStatus(String bookingStatus) {
+        this.bookingStatus = bookingStatus;
+    }
+
+    public LocalDateTime getCancelledAt() {
+        return cancelledAt;
+    }
+
+    public void setCancelledAt(LocalDateTime cancelledAt) {
+        this.cancelledAt = cancelledAt;
+    }
+
+    public String getRefundId() {
+        return refundId;
+    }
+
+    public void setRefundId(String refundId) {
+        this.refundId = refundId;
+    }
+
+    public String getRefundStatus() {
+        return refundStatus;
+    }
+
+    public void setRefundStatus(String refundStatus) {
+        this.refundStatus = refundStatus;
+    }
 }

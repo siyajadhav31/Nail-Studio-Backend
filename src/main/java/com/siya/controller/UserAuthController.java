@@ -100,7 +100,8 @@ public class UserAuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(
-            @RequestBody Map<String, String> data) {
+            @RequestBody Map<String, String> data,
+            HttpSession session) {
 
         String email = data.get("email");
         String password = data.get("password");
@@ -139,6 +140,11 @@ public class UserAuthController {
         user.setLastLogin(now);
         userRepository.save(user);
 
+        // Save customer details in the session
+        session.setAttribute("customerId", user.getId());
+        session.setAttribute("customerEmail", user.getEmail());
+        session.setAttribute("customerName", user.getName());
+
         // Save every successful login
         loginHistoryRepository.save(
             new LoginHistory(user, now)
@@ -149,6 +155,45 @@ public class UserAuthController {
                 "message", "Login successful.",
                 "name", user.getName(),
                 "email", user.getEmail()
+            )
+        );
+    }
+
+    // ==========================================
+    // CHECK CUSTOMER SESSION
+    // GET /api/users/session
+    // ==========================================
+
+    @GetMapping("/session")
+    public ResponseEntity<?> checkCustomerSession(
+            HttpSession session) {
+
+        Long customerId =
+                (Long) session.getAttribute("customerId");
+
+        String customerEmail =
+                (String) session.getAttribute("customerEmail");
+
+        String customerName =
+                (String) session.getAttribute("customerName");
+
+        if (customerId == null || customerEmail == null) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(
+                        Map.of(
+                            "loggedIn", false,
+                            "message", "Customer login required."
+                        )
+                    );
+        }
+
+        return ResponseEntity.ok(
+            Map.of(
+                "loggedIn", true,
+                "customerId", customerId,
+                "email", customerEmail,
+                "name", customerName == null ? "" : customerName
             )
         );
     }
