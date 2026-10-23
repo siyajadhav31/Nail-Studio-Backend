@@ -3,7 +3,7 @@ package com.siya.controller;
 
 import com.siya.entity.Booking;
 import com.siya.repository.BookingRepository;
-import com.siya.service.TwilioSmsService;
+import com.siya.service.EmailService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -31,14 +31,14 @@ import java.util.stream.Collectors;
 public class BookingController {
 
     private final BookingRepository bookingRepository;
-    private final TwilioSmsService twilioSmsService;
+    private final EmailService emailService;
 
     public BookingController(
             BookingRepository bookingRepository,
-            TwilioSmsService twilioSmsService) {
+            EmailService emailService) {
 
         this.bookingRepository = bookingRepository;
-        this.twilioSmsService = twilioSmsService;
+        this.emailService = emailService;
     }
 
     // =========================================================
@@ -262,7 +262,6 @@ public class BookingController {
     // =========================================================
     // GET BOOKING BY NUMERIC ID
     // GET /api/bookings/123
-    // IMPORTANT: Only numeric IDs match this route.
     // =========================================================
 
     @GetMapping("/{id:\\d+}")
@@ -279,7 +278,7 @@ public class BookingController {
     }
 
     // =========================================================
-    // CANCEL CUSTOMER'S OWN BOOKING + SMS
+    // CANCEL CUSTOMER'S OWN BOOKING + EMAIL
     // PUT /api/bookings/{id}/cancel
     // =========================================================
 
@@ -336,38 +335,20 @@ public class BookingController {
             booking.setRefundStatus("NOT_REQUIRED");
         }
 
-        // Save cancellation before attempting SMS.
+        // Save cancellation before attempting email.
         Booking savedBooking = bookingRepository.save(booking);
 
-        String smsMessage;
+        boolean emailSent =
+            emailService.sendCancellationEmail(savedBooking);
 
-        if ("PAID".equalsIgnoreCase(savedBooking.getPaymentStatus())) {
-
-            smsMessage = "Hello " + savedBooking.getName()
-                + ", your Nail Studio appointment has been cancelled. "
-                + "Your refund is pending manual processing. "
-                + "Booking ID: " + savedBooking.getId() + ".";
-
-        } else {
-
-            smsMessage = "Hello " + savedBooking.getName()
-                + ", your Nail Studio appointment has been cancelled. "
-                + "Booking ID: " + savedBooking.getId() + ".";
-        }
-
-        boolean smsSent = twilioSmsService.sendSms(
-            savedBooking.getPhone(),
-            smsMessage
-        );
-
-        System.out.println("Cancellation SMS sent: " + smsSent);
+        System.out.println("Cancellation email sent: " + emailSent);
 
         return ResponseEntity.ok(
             Map.of(
                 "message", "Booking cancelled successfully.",
                 "booking", savedBooking,
                 "refundStatus", savedBooking.getRefundStatus(),
-                "smsSent", smsSent
+                "emailSent", emailSent
             )
         );
     }
@@ -546,7 +527,7 @@ public class BookingController {
     }
 
     // =========================================================
-    // ADMIN CONFIRMS MANUALLY PROCESSED REFUND
+    // ADMIN CONFIRMS MANUALLY PROCESSED REFUND + EMAIL
     // PUT /api/bookings/{id}/confirm-refund
     // =========================================================
 
@@ -602,24 +583,16 @@ public class BookingController {
 
         Booking savedBooking = bookingRepository.save(booking);
 
-        String message = "Hello " + savedBooking.getName()
-            + ", your Nail Studio refund has been marked as processed. "
-            + "Booking ID: " + savedBooking.getId() + ".";
+        boolean emailSent =
+            emailService.sendRefundEmail(savedBooking);
 
-        if (refundReference != null && !refundReference.isBlank()) {
-            message += " Refund reference: " + refundReference.trim() + ".";
-        }
-
-        boolean smsSent = twilioSmsService.sendSms(
-            savedBooking.getPhone(),
-            message
-        );
+        System.out.println("Refund email sent: " + emailSent);
 
         return ResponseEntity.ok(
             Map.of(
                 "message", "Refund status updated.",
                 "refundStatus", savedBooking.getRefundStatus(),
-                "smsSent", smsSent,
+                "emailSent", emailSent,
                 "booking", savedBooking
             )
         );
