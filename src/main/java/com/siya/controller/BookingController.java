@@ -157,7 +157,7 @@ public class BookingController {
 
             if (booking.getNotes() != null
                     && booking.getNotes().toLowerCase()
-                            .contains("virtual preview")) {
+                        .contains("virtual preview")) {
 
                 booking.setBookingType("VIRTUAL");
 
@@ -183,20 +183,23 @@ public class BookingController {
             );
         }
 
-        // PAYMENT STATUS
+        // PAYMENT STATUS AND AMOUNT
         if ("VIRTUAL".equals(booking.getBookingType())) {
-            booking.setPaymentStatus("N/A");
-        } else {
-            booking.setPaymentStatus("PENDING");
-        }
 
-        // PAYMENT AMOUNT
-        if ("SERVICE".equals(booking.getBookingType())) {
-            booking.setPaymentAmount(
-                getServicePrice(booking.getService())
-            );
-        } else {
+            booking.setPaymentStatus("N/A");
             booking.setPaymentAmount(0.0);
+
+        } else {
+
+            booking.setPaymentStatus("PENDING");
+
+            if ("SERVICE".equals(booking.getBookingType())) {
+                booking.setPaymentAmount(
+                    getServicePrice(booking.getService())
+                );
+            } else {
+                booking.setPaymentAmount(0.0);
+            }
         }
 
         // PAYMENT ID
@@ -305,7 +308,7 @@ public class BookingController {
                 .body(Map.of("message", "Booking not found."));
         }
 
-        // Customer can cancel only their own booking.
+        // CUSTOMER OWNERSHIP CHECK
         if (booking.getEmail() == null
                 || !booking.getEmail().equalsIgnoreCase(customerEmail)) {
 
@@ -324,24 +327,28 @@ public class BookingController {
                 ));
         }
 
-        // UPDATE BOOKING STATUS
+        // CANCEL BOOKING
         booking.setBookingStatus("CANCELLED");
         booking.setCancelledAt(LocalDateTime.now());
 
-        // Refund requires manual processing.
+        // REFUND IS MANUAL
         if ("PAID".equalsIgnoreCase(booking.getPaymentStatus())) {
             booking.setRefundStatus("PENDING");
         } else {
             booking.setRefundStatus("NOT_REQUIRED");
         }
 
-        // Save cancellation before attempting email.
         Booking savedBooking = bookingRepository.save(booking);
 
+        // SEND CANCELLATION EMAIL
         boolean emailSent =
             emailService.sendCancellationEmail(savedBooking);
 
-        System.out.println("Cancellation email sent: " + emailSent);
+        System.out.println("========== CANCELLATION EMAIL ==========");
+        System.out.println("Booking ID: " + savedBooking.getId());
+        System.out.println("Customer Email: " + savedBooking.getEmail());
+        System.out.println("Cancellation email accepted: " + emailSent);
+        System.out.println("========================================");
 
         return ResponseEntity.ok(
             Map.of(
@@ -408,12 +415,15 @@ public class BookingController {
         }
 
         // PAYMENT ID
-        if (updatedBooking.getPaymentId() != null
-                && !updatedBooking.getPaymentId().trim().isEmpty()) {
+        if (updatedBooking.getPaymentId() != null) {
 
-            existingBooking.setPaymentId(
-                updatedBooking.getPaymentId().trim()
-            );
+            if (updatedBooking.getPaymentId().trim().isEmpty()) {
+                existingBooking.setPaymentId(null);
+            } else {
+                existingBooking.setPaymentId(
+                    updatedBooking.getPaymentId().trim()
+                );
+            }
         }
 
         // DESIGN
@@ -574,20 +584,45 @@ public class BookingController {
                 ));
         }
 
+        // OPTIONAL MANUAL REFUND REFERENCE
         if (refundReference != null && !refundReference.isBlank()) {
             booking.setRefundId(refundReference.trim());
         }
 
-        // Records manual refund completion; does not transfer money.
+        /*
+         * This records the administrator's confirmation that
+         * the manual refund has been processed.
+         * It does not transfer money automatically.
+         */
         booking.setRefundStatus("REFUNDED");
 
+        // SAVE REFUND STATUS
         Booking savedBooking = bookingRepository.save(booking);
 
-        boolean emailSent =
-            emailService.sendRefundEmail(savedBooking);
+        // DEBUG LOGS BEFORE SENDING EMAIL
+        System.out.println("========== REFUND EMAIL DEBUG ==========");
+        System.out.println("Booking ID: " + savedBooking.getId());
+        System.out.println("Customer Email: " + savedBooking.getEmail());
+        System.out.println("Booking Status: " + savedBooking.getBookingStatus());
+        System.out.println("Payment Status: " + savedBooking.getPaymentStatus());
+        System.out.println("Refund Status: " + savedBooking.getRefundStatus());
 
-        System.out.println("Refund email sent: " + emailSent);
+        // SEND REFUND EMAIL
+        boolean emailSent = false;
 
+        try {
+            emailSent = emailService.sendRefundEmail(savedBooking);
+
+        } catch (Exception e) {
+            System.err.println("REFUND EMAIL EXCEPTION: "
+                + e.getClass().getSimpleName()
+                + " - " + e.getMessage());
+        }
+
+        System.out.println("Refund email accepted: " + emailSent);
+        System.out.println("========================================");
+
+        // RETURN RESULT TO FRONTEND
         return ResponseEntity.ok(
             Map.of(
                 "message", "Refund status updated.",
